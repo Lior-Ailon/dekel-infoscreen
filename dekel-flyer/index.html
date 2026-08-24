@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="version" content="2026-08-20-v2-rebrand">
+<title>Info Screen · מסך הודעות לכל עסק</title>
+<link rel="icon" href="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0f172a; --ink-soft:#64748b;
+  --brand:#0d9488; --brand-light:#14b8a6; --brand-dark:#0f766e;
+  --navy:#1e3a5f; --navy-light:#2e5a8f;
+  --paper:#f8fafc; --paper-2:#ffffff; --paper-edge:#e2e8f0;
+  --gold:#d9a441; --gold-light:#e8c274;
+  --r:16px; --r-sm:10px;
+  --shadow:0 4px 16px rgba(15,23,42,.06);
+  --shadow-lg:0 12px 32px rgba(15,23,42,.10);
+}
+body{font-family:'Heebo',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+h1,h2,h3{letter-spacing:-.02em}
+button{font-family:inherit;cursor:pointer;border:none}
+a{color:inherit;text-decoration:none}
+
+/* HERO */
+.hero{
+  position:relative;min-height:92vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:60px 24px;overflow:hidden;
+  background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 35%,#0f766e 70%,#0d9488 100%);
+  color:#fff;
+}
+.hero::before{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 20% 30%,rgba(13,148,136,.25) 0%,transparent 50%),
+    radial-gradient(circle at 80% 70%,rgba(30,58,95,.30) 0%,transparent 50%);
+  z-index:0;
+}
+.hero-content{position:relative;z-index:2;max-width:780px}
+.hero .badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(8px);padding:8px 20px;border-radius:999px;
+  font-size:.85rem;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:28px;
+}
+.hero .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--brand-light);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero-logo{
+  width:80px;height:80px;border-radius:20px;
+  background:linear-gradient(160deg,#fff,rgba(255,255,255,.85));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;font-size:42px;font-weight:900;
+  color:var(--brand);box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.hero h1{font-size:clamp(2.8rem,6vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:20px}
+.hero h1 .accent{background:linear-gradient(135deg,var(--brand-light),#5eead4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .sub{font-size:clamp(1.1rem,2.5vw,1.4rem);color:rgba(255,255,255,.85);max-width:560px;margin:0 auto 36px;font-weight:400}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-primary{
+  padding:16px 40px;border-radius:999px;font-size:1.1rem;font-weight:700;
+  background:#fff;color:var(--brand-dark);transition:.25s;box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.btn-secondary{
+  padding:16px 40px;border-radius:999px;font-size:1.1rem;font-weight:700;
+  background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.3);
+  backdrop-filter:blur(8px);transition:.25s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,.16);transform:translateY(-2px)}
+.hero-nav{position:absolute;top:0;left:0;right:0;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;z-index:5}
+.hero-nav .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem}
+.hero-nav .brand .icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px}
+.hero-nav .partner{font-size:.82rem;color:rgba(255,255,255,.55);font-weight:500}
+
+/* USE CASES STRIP */
+.usecases{padding:80px 24px;background:var(--paper-2)}
+.section-head{text-align:center;margin-bottom:48px}
+.section-head .tag{font-size:.82rem;font-weight:700;letter-spacing:.18em;color:var(--brand);text-transform:uppercase;margin-bottom:10px}
+.section-head h2{font-size:clamp(2rem,4vw,2.8rem);font-weight:900;color:var(--ink);margin-bottom:12px}
+.section-head p{font-size:1.1rem;color:var(--ink-soft);max-width:520px;margin:0 auto}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.case-card{
+  background:var(--paper-2);border:1px solid var(--paper-edge);border-radius:var(--r);
+  padding:28px 24px;text-align:center;transition:.25s;
+}
+.case-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--brand-light)}
+.case-card .emoji{font-size:38px;margin-bottom:14px}
+.case-card h3{font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:6px}
+.case-card p{font-size:.9rem;color:var(--ink-soft);line-height:1.5}
+
+/* HOW IT WORKS */
+.howitworks{padding:80px 24px;background:var(--paper)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;max-width:1000px;margin:0 auto}
+.step{position:relative;padding:32px 28px;background:var(--paper-2);border-radius:var(--r);border:1px solid var(--paper-edge);box-shadow:var(--shadow)}
+.step .num{
+  position:absolute;top:-18px;right:24px;width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;
+  box-shadow:0 4px 12px rgba(13,148,136,.3);
+}
+.step h3{font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:8px;margin-top:6px}
+.step p{font-size:.95rem;color:var(--ink-soft);line-height:1.6}
+
+/* FEATURES */
+.features{padding:80px 24px;background:var(--paper-2)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:0 auto}
+.feat-card{
+  display:flex;gap:16px;padding:28px;background:var(--paper);border-radius:var(--r);
+  border:1px solid var(--paper-edge);transition:.25s;
+}
+.feat-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.feat-icon{
+  width:48px;height:48px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;
+}
+.feat-card h3{font-size:1.05rem;font-weight:700;margin-bottom:4px;color:var(--ink)}
+.feat-card p{font-size:.88rem;color:var(--ink-soft);line-height:1.5}
+
+/* DEMO PREVIEW */
+.demo-section{padding:80px 24px;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff;text-align:center}
+.demo-section h2{font-size:clamp(2rem,4vw,2.8rem);font-weight:900;margin-bottom:16px}
+.demo-section p{font-size:1.1rem;color:rgba(255,255,255,.7);margin-bottom:36px}
+.demo-frame{
+  max-width:700px;margin:0 auto;border-radius:var(--r);overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.1);
+}
+.demo-frame img{width:100%;display:block}
+.demo-cta{margin-top:36px}
+
+/* PRICING TEASER */
+.pricing{padding:80px 24px;background:var(--paper)}
+.price-card{
+  max-width:500px;margin:0 auto;text-align:center;
+  background:var(--paper-2);border:2px solid var(--brand);border-radius:var(--r);
+  padding:40px 32px;box-shadow:var(--shadow-lg);
+}
+.price-card .label{font-size:.85rem;font-weight:700;color:var(--brand);letter-spacing:.1em;margin-bottom:12px}
+.price-card .price{font-size:3rem;font-weight:900;color:var(--ink)}
+.price-card .price .per{font-size:1rem;color:var(--ink-soft);font-weight:500}
+.price-card .desc{font-size:.95rem;color:var(--ink-soft);margin:12px 0 28px}
+.price-card ul{list-style:none;text-align:right;margin-bottom:32px}
+.price-card ul li{padding:8px 0;border-bottom:1px solid var(--paper-edge);font-size:.95rem;color:var(--ink)}
+.price-card ul li:last-child{border:none}
+.price-card ul li .check{color:var(--brand);font-weight:900;margin-left:8px}
+
+/* FOOTER */
+.footer{padding:48px 24px;background:#0f172a;color:rgba(255,255,255,.7);text-align:center}
+.footer .logo{font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:10px}
+.footer .tagline{font-size:.9rem;color:rgba(255,255,255,.5);margin-bottom:20px}
+.footer .partner{font-size:.82rem;color:rgba(255,255,255,.35);padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+.footer .links{display:flex;gap:20px;justify-content:center;margin-bottom:20px;font-size:.9rem}
+.footer .links a{color:rgba(255,255,255,.7);transition:.2s}
+.footer .links a:hover{color:#fff}
+
+/* Responsive */
+@media(max-width:600px){
+  .hero h1{font-size:2.2rem}
+  .hero .sub{font-size:1rem}
+  .btn-primary,.btn-secondary{width:100%;padding:14px 20px}
+  .hero-nav{padding:16px 20px}
+  .hero-nav .partner{display:none}
+  .cases-grid{grid-template-columns:1fr 1fr}
+  .feat-card{flex-direction:column}
+}
+
+/* Animations */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-nav">
+    <div class="brand">
+      <div class="icon">📺</div>
+      <span style="font-size:1.3rem">Info Screen</span>
+    </div>
+    
+  </div>
+  <div class="hero-content">
+    <div class="badge"><span class="dot"></span> מסך חכם · מתעדכן לבד · לכל עסק</div>
+    <div class="hero-logo">i</div>
+    <h1>המסך שלך.<br><span class="accent">ההודעות שלך.</span></h1>
+    <p class="sub">
+      מסך מידע חכם שמתעדכן מרחוק מהטלפון — הודעות, תפריט, אירועים, שעות פתיחה, מבצעים ועוד.
+      פשוט לעדכן. יפה להציג. לכל עסק.
+    </p>
+    <div class="cta">
+      <button class="btn-primary" onclick="document.getElementById('usecases').scrollIntoView({behavior:'smooth'})">למה לי מסך?</button>
+      <button class="btn-secondary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">ראה דוגמה</button>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="usecases" id="usecases">
+  <div class="section-head">
+    <div class="tag">לכל עסק</div>
+    <h2>מסך אחד. אינסוף יישומים.</h2>
+    <p>כל עסק שרוצה להציג מידע ללקוחות — מסך Info Screen מתאים לו</p>
+  </div>
+  <div class="cases-grid">
+    <div class="case-card reveal"><div class="emoji">🍔</div><h3>מסעדות ופיצריות</h3><p>תפריט דיגיטלי, מבצעים ומנה היום — מתעדכן בלחיצה</p></div>
+    <div class="case-card reveal"><div class="emoji">📚</div><h3>ספריות ומרכזים</h3><p>אירועים, שעות פתיחה והודעות לקהילה</p></div>
+    <div class="case-card reveal"><div class="emoji">🩺</div><h3>מרפאות וקליניקות</h3><p>תורים, הודעות למטופלים ומידע שירות</p></div>
+    <div class="case-card reveal"><div class="emoji">🏪</div><h3>חנויות ורשתות</h3><p>מבצעים, מוצרים חדשים והטבות ללקוחות</p></div>
+    <div class="case-card reveal"><div class="emoji">🏢</div><h3>לובי ומשרדים</h3><p>הודעות לעובדים, אירועים ומידע כללי</p></div>
+    <div class="case-card reveal"><div class="emoji">💈</div><h3>בעלי מלאכה</h3><p>מחירון שירותים, תורים והודעות ללקוחות</p></div>
+    <div class="case-card reveal"><div class="emoji">🏋️</div><h3>חדרי כושר</h3><p>מערכת שיעורים, הודעות ועדכונים</p></div>
+    <div class="case-card reveal"><div class="emoji">🏫</div><h3>מוסדות חינוך</h3><p>הודעות להורים, אירועים ולוח זמנים</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="howitworks">
+  <div class="section-head">
+    <div class="tag">איך זה עובד</div>
+    <h2>פשוט כמו 1-2-3</h2>
+    <p>אין צורך בידע טכני. כל אחד יכול.</p>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="num">1</div>
+      <h3>מתחברים</h3>
+      <p>נכנסים לאתר הניהול מהטלפון או המחשב — כמו להיכנס לפייסבוק.</p>
+    </div>
+    <div class="step reveal">
+      <div class="num">2</div>
+      <h3>מעדכנים</h3>
+      <p>כותבים הודעה, מעלים תמונה, מוסיפים אירוע או משנים שעות פתיחה — בלחיצה.</p>
+    </div>
+    <div class="step reveal">
+      <div class="num">3</div>
+      <h3>זה מופיע</h3>
+      <p>המסך מתעדכן לבד. לא צריך לגעת בו בכלל. הכל קורה מרחוק.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-head">
+    <div class="tag">יתרונות</div>
+    <h2>למה Info Screen?</h2>
+    <p>כל מה שעסק צריך כדי להציג מידע בצורה מקצועית</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card reveal">
+      <div class="feat-icon">📱</div>
+      <div><h3>ניהול מהטלפון</h3><p>עורך הודעות, תפריט או אירועים מכל מכשיר — בלי לקום מהכיסא.</p></div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">⚡</div>
+      <div><h3>עדכון מיידי</h3><p>המסך מתעדכן אוטומטית. לא צריך לרענן או לגעת בו.</p></div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🎨</div>
+      <div><h3>עיצוב מקצועי</h3><p>תבניות יפות שמתאימות לכל עסק — ממסעדה ועד מרפאה.</p></div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🖥️</div>
+      <div><h3>כל מסך מתאים</h3><p>טלוויזיה, מסך מחשב או טאבלט — המערכת מסתדרת עם הכל.</p></div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🔒</div>
+      <div><h3>מאובטח ופרטי</h3><p>כל עסק מקבל סביבה נפרדת. רק מי שאתה מרשה רואה ומנהל.</p></div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">💸</div>
+      <div><h3>חיסכון אמיתי</h3><p>בלי להדפיס, בלי להחליף שלטים, בלי להזמין מעצב. הכל דיגיטלי.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section" id="demo">
+  <div class="section-head" style="color:#fff">
+    <div class="tag" style="color:var(--brand-light)">דוגמה חיה</div>
+    <h2>רואים את זה עובד</h2>
+    <p style="color:rgba(255,255,255,.7)">ככה נראה המסך של הלקוח שלך — תמיד מעודכן, תמיד יפה</p>
+  </div>
+  <div class="demo-frame">
+    <a href="https://lior-ailon.github.io/ailon-task-apps/dekel-library/display.html?library_id=6a7cc19fa127f9005c2b4f3f" target="_blank">
+      <img src="https://lior-ailon.github.io/ailon-task-apps/dekel-flyer/demo-preview.png" alt="Info Screen Demo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div style="display:none;min-height:300px;align-items:center;justify-content:center;background:#1e3a5f;font-size:1.2rem;color:#fff;flex-direction:column;gap:12px;padding:40px">
+        <div style="font-size:48px">📺</div>
+        <div>לחץ כאן לצפייה במסך חי</div>
+      </div>
+    </a>
+  </div>
+  <div class="demo-cta">
+    <a href="https://lior-ailon.github.io/ailon-task-apps/dekel-library/display.html?library_id=6a7cc19fa127f9005c2b4f3f" target="_blank">
+      <button class="btn-primary">פתח מסך לדוגמה →</button>
+    </a>
+  </div>
+</section>
+
+<!-- PRICING TEASER -->
+<section class="pricing">
+  <div class="price-card">
+    <div class="label">מתחילים מהר</div>
+    <div class="price">₪99<span class="per">/חודש</span></div>
+    <div class="desc">לכל עסק. בלי התקנות. בלי התחייבות.</div>
+    <ul>
+      <li><span class="check">✓</span> מסך אחד פעיל</li>
+      <li><span class="check">✓</span> ניהול הודעות ואירועים ללא הגבלה</li>
+      <li><span class="check">✓</span> עדכון מיידי מהטלפון</li>
+      <li><span class="check">✓</span> עיצוב מקצועי מובנה</li>
+      <li><span class="check">✓</span> תמיכה בשעות עסקים</li>
+    </ul>
+    <button class="btn-primary" onclick="window.location.href='https://wa.me/972502345678?text=שלום, אני מעוניין ב-Info Screen'">צרו קשר להתחלה</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="logo">📺 Info Screen</div>
+  <div class="tagline">המסך החכם לכל עסק</div>
+  <div class="links">
+    <a href="https://lior-ailon.github.io/ailon-task-apps/dekel-library/">כניסה למערכת</a>
+    <a href="https://wa.me/972502345678?text=שלום, אני מעוניין ב-Info Screen">צרו קשר</a>
+    <a href="https://lior-ailon.github.io/ailon-task-apps/dekel-library/display.html?library_id=6a7cc19fa127f9005c2b4f3f">מסך לדוגמה</a>
+  </div>
+  <div class="partner">מבית דקל מחשבים</div>
+</footer>
+
+<script>
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
