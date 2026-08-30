@@ -11,34 +11,34 @@
 :root{
   --blue:#3b82f6;--blue-dark:#2563eb;--orange:#f59e0b;--orange-dark:#f97316;
   --green:#22c55e;--green-dark:#16a34a;--purple:#8b5cf6;--purple-dark:#7c3aed;
-  --pad:clamp(6px,1vw,16px);
-  --gap:clamp(5px,.7vw,10px);
-  --radius:clamp(10px,1.2vw,22px);
-  --card-radius:clamp(8px,.8vw,14px);
-  --bar-h:clamp(36px,4.5vw,60px);
-  --fs-title:clamp(1rem,3vw,3rem);
-  --fs-subtitle:clamp(.7rem,1.5vw,1.5rem);
-  --fs-clock:clamp(1.1rem,3vw,3rem);
-  --fs-clock-date:clamp(.65rem,1.2vw,1.2rem);
-  --fs-icon:clamp(20px,3vw,48px);
-  --fs-news-head:clamp(.9rem,2vw,2rem);
-  --fs-news-card:clamp(.75rem,1.3vw,1.3rem);
-  --fs-news-desc:clamp(.65rem,1vw,1rem);
-  --fs-ticker:clamp(.75rem,1.4vw,1.4rem);
-  --fs-ticker-label:clamp(.8rem,1.5vw,1.5rem);
-  --fs-caption:clamp(.8rem,1.8vw,1.8rem);
-  --fs-ph-icon:clamp(32px,5vw,64px);
-  --fs-ph-text:clamp(.9rem,1.8vw,1.8rem);
+  --pad:clamp(6px,1.2vw,32px);
+  --gap:clamp(5px,.8vw,18px);
+  --radius:clamp(10px,1.2vw,40px);
+  --card-radius:clamp(8px,.8vw,24px);
+  --bar-h:clamp(36px,4.5vw,100px);
+  --fs-title:clamp(1rem,3vw,6rem);
+  --fs-subtitle:clamp(.7rem,1.5vw,3rem);
+  --fs-clock:clamp(1.1rem,3vw,6rem);
+  --fs-clock-date:clamp(.65rem,1.2vw,2.5rem);
+  --fs-icon:clamp(20px,3vw,96px);
+  --fs-news-head:clamp(.9rem,2vw,4rem);
+  --fs-news-card:clamp(.75rem,1.3vw,2.5rem);
+  --fs-news-desc:clamp(.65rem,1vw,2rem);
+  --fs-ticker:clamp(.75rem,1.4vw,2.8rem);
+  --fs-ticker-label:clamp(.8rem,1.5vw,3rem);
+  --fs-caption:clamp(.8rem,1.8vw,3.5rem);
+  --fs-ph-icon:clamp(32px,5vw,128px);
+  --fs-ph-text:clamp(.9rem,1.8vw,3.5rem);
 }
 html{height:100%}
 body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:linear-gradient(135deg,#eef2f7,#e0e7f0);color:#1e293b;overflow:hidden}
 #frame{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
 .wrap{width:100%;flex:1;display:flex;flex-direction:column;gap:var(--gap);padding:var(--pad);padding-bottom:calc(var(--bar-h) + var(--pad) * 2);min-height:0;overflow:hidden}
 .header{display:flex;gap:var(--gap);flex-shrink:0;align-items:stretch}
-.header-right{flex-shrink:0;width:clamp(120px,12vw,240px)}
+.header-right{flex-shrink:0;width:clamp(120px,12vw,400px)}
 .header-center{flex:1;display:flex;gap:var(--gap);align-items:stretch}
-.header-left{flex-shrink:0;width:clamp(100px,10vw,200px)}
-.rect{border-radius:var(--radius);padding:clamp(8px,1.2vw,20px) clamp(12px,1.5vw,24px);display:flex;align-items:center;justify-content:center;gap:clamp(6px,.8vw,12px);box-shadow:0 4px 14px rgba(0,0,0,.10)}
+.header-left{flex-shrink:0;width:clamp(100px,10vw,350px)}
+.rect{border-radius:var(--radius);padding:clamp(8px,1.2vw,32px) clamp(12px,1.5vw,40px);display:flex;align-items:center;justify-content:center;gap:clamp(6px,.8vw,12px);box-shadow:0 4px 14px rgba(0,0,0,.10)}
 /* Right = Clock (time + date) */
 .rect-clock{width:100%;height:100%;background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff;flex-direction:column;gap:clamp(3px,.5vw,8px)}
 /* Center = Library name + optional logo */
@@ -93,7 +93,16 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:linear-grad
 @keyframes tickerLTR{from{transform:translateX(0%)}to{transform:translateX(-50%)}}
 .news-item{display:inline-flex;align-items:center;gap:8px;color:#fff;font-size:var(--fs-ticker);font-weight:500;direction:rtl}
 .news-item .dot{width:6px;height:6px;border-radius:50%;background:#fff;opacity:.7;flex-shrink:0}
-@media(max-width:600px) and (orientation:portrait){
+/* Tablet portrait (768px) */
+@media(max-width:900px){
+  .body-grid{flex-direction:column;min-height:0}
+  .photo-panel{min-height:30vh;flex:none}
+  .news-panel{flex:1;min-height:0}
+  .header-right{width:clamp(100px,14vw,180px)}
+  .header-left{width:clamp(80px,12vw,150px)}
+}
+/* Mobile portrait */
+@media(max-width:600px){
   .header{flex-direction:column}
   .header-center{flex-direction:row;width:100%}
   .header-right{width:100%}
@@ -105,7 +114,37 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:linear-grad
   .news-bar{flex-wrap:wrap;padding:6px 12px;gap:6px;height:auto;min-height:36px}
   .news-label{border-left:none;padding-left:0}
 }
+/* Small phones */
 @media(max-width:380px){.rect{padding:8px 12px}.rect-clock .clock-num{font-size:1rem}}
+/* Large TV / 4K (2560px+) */
+@media(min-width:2560px){
+  :root{
+    --pad:clamp(16px,1.5vw,48px);
+    --gap:clamp(10px,1vw,24px);
+    --radius:clamp(20px,1.2vw,48px);
+    --card-radius:clamp(12px,.8vw,28px);
+    --bar-h:clamp(60px,4vw,120px);
+    --fs-title:clamp(2rem,3vw,8rem);
+    --fs-subtitle:clamp(1.2rem,1.5vw,4rem);
+    --fs-clock:clamp(2rem,3vw,8rem);
+    --fs-clock-date:clamp(1rem,1.2vw,3rem);
+    --fs-icon:clamp(40px,3vw,128px);
+    --fs-news-head:clamp(1.5rem,2vw,5rem);
+    --fs-news-card:clamp(1rem,1.3vw,3.5rem);
+    --fs-news-desc:clamp(.8rem,1vw,2.5rem);
+    --fs-ticker:clamp(1rem,1.4vw,3.5rem);
+    --fs-ticker-label:clamp(1rem,1.5vw,4rem);
+    --fs-caption:clamp(1.2rem,1.8vw,4.5rem);
+    --fs-ph-icon:clamp(64px,5vw,192px);
+    --fs-ph-text:clamp(1.2rem,1.8vw,4.5rem);
+  }
+  .header-right{width:clamp(200px,14vw,500px)}
+  .header-left{width:clamp(160px,12vw,400px)}
+  .news-card .badge{width:clamp(40px,2vw,80px);height:clamp(40px,2vw,80px);font-size:clamp(20px,1.5vw,48px)}
+  .news-card .event-date{font-size:clamp(.8rem,1vw,1.8rem);padding:6px 16px}
+  .photo-dot{width:clamp(8px,.5vw,16px);height:clamp(8px,.5vw,16px)}
+  .photo-dot.active{width:clamp(20px,1.5vw,36px)}
+}
 </style>
 </head>
 <body>
