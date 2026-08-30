@@ -112,11 +112,9 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:linear-grad
 <div id="frame">
 <div class="wrap">
   <div class="header">
-    <div class="header-left">
-      <div class="rect rect-logo"><div class="ic">📚</div><div class="txt"><h2>ספריית רחובות</h2></div></div>
-      <div class="rect rect-title"><div class="ic">📖</div><div class="txt"><h2>הספרייה הציבורית</h2><p>בית הספר של העם</p></div></div>
-    </div>
     <div class="header-right"><div class="rect rect-clock"><div class="clock-num" id="clock">--:--</div><div class="clock-date" id="dateStr">--</div></div></div>
+    <div class="header-center"><div class="rect rect-library"><div class="lib-icon">📚</div><div class="txt"><h2>ספריית רחובות</h2><p>הספרייה הציבורית — בית הספר של העם</p></div></div></div>
+    <div class="header-left"><div class="rect rect-infoscreen"><div class="is-icon">i</div><div class="is-text">Info Screen</div></div></div>
   </div>
   <div class="body-grid">
     <div class="photo-panel" id="photoPanel">
@@ -198,36 +196,47 @@ function renderPositiveNews(items){
 function renderPhotos(items){
   if(!items||items.length===0)items=CONTENT.photos;
   if(!items||items.length===0)return;
-  const photoPanel=document.getElementById('photoPanel');
-  const photoDots=document.getElementById('photoDots');
-  document.querySelectorAll('.photo-slide').forEach(s=>s.remove());
-  items.forEach((p,i)=>{
-    const slide=document.createElement('div');
-    slide.className='photo-slide'+(i===0?' on':'');
-    if(p.image_url){slide.innerHTML='<img src="'+p.image_url+'" alt="'+(p.title||'')+'">'}
-    else{slide.innerHTML='<div class="photo-ph"><div class="ic">🖼️</div><div class="t">'+(p.title||'תמונות מהספרייה')+'</div></div>'}
-    photoPanel.insertBefore(slide,photoDots);
+  const panel=document.getElementById('photoPanel');
+  const dots=document.getElementById('photoDots');
+  const caption=document.getElementById('caption');
+  let slidesHtml='';
+  let dotsHtml='';
+  items.forEach((item,i)=>{
+    const img=item.image_url||'';
+    const title=item.title||'';
+    if(img){
+      slidesHtml+='<div class="photo-slide'+(i===0?' on':'')+'"><img src="'+img+'" alt="'+title+'"></div>';
+    }else{
+      slidesHtml+='<div class="photo-slide'+(i===0?' on':'')+'"><div class="photo-ph"><div class="ic">🖼️</div><div class="t">'+title+'</div></div></div>';
+    }
+    dotsHtml+='<div class="photo-dot'+(i===0?' active':'')+'" data-idx="'+i+'"></div>';
   });
-  photoDots.innerHTML='';
-  items.forEach((_,i)=>{
-    const dot=document.createElement('div');
-    dot.className='photo-dot'+(i===0?' active':'');
-    dot.onclick=()=>gotoPhoto(i,items);
-    photoDots.appendChild(dot);
+  panel.insertAdjacentHTML('afterbegin',slidesHtml);
+  dots.innerHTML=dotsHtml;
+  if(items[0]&&items[0].title)caption.textContent=items[0].title;
+  let curIdx=0;
+  const allSlides=panel.querySelectorAll('.photo-slide');
+  const allDots=dots.querySelectorAll('.photo-dot');
+  allDots.forEach(dot=>{
+    dot.addEventListener('click',()=>{
+      const idx=parseInt(dot.dataset.idx);
+      allSlides.forEach(s=>s.classList.remove('on'));
+      allDots.forEach(d=>d.classList.remove('active'));
+      allSlides[idx].classList.add('on');
+      allDots[idx].classList.add('active');
+      caption.textContent=items[idx].title||'';
+      curIdx=idx;
+    });
   });
-  document.getElementById('caption').textContent=items[0].title||'ברוכים הבאים';
-  if(window._photoInterval)clearInterval(window._photoInterval);
-  let curPhoto=0;
-  window._photoInterval=setInterval(()=>{curPhoto=(curPhoto+1)%items.length;gotoPhoto(curPhoto,items)},7000);
+  setInterval(()=>{
+    curIdx=(curIdx+1)%items.length;
+    allSlides.forEach(s=>s.classList.remove('on'));
+    allDots.forEach(d=>d.classList.remove('active'));
+    allSlides[curIdx].classList.add('on');
+    allDots[curIdx].classList.add('active');
+    caption.textContent=items[curIdx].title||'';
+  },6000);
 }
-function gotoPhoto(n,items){
-  document.querySelectorAll('.photo-slide').forEach((s,i)=>s.classList.toggle('on',i===n));
-  document.querySelectorAll('.photo-dot').forEach((d,i)=>d.classList.toggle('active',i===n));
-  if(items&&items[n])document.getElementById('caption').textContent=items[n].title||'';
-}
-renderLibrary(CONTENT.new_in_library);
-renderPositiveNews(CONTENT.positive_news);
-renderPhotos(CONTENT.photos);
 loadContent();
 setInterval(loadContent,60000);
 </script>
