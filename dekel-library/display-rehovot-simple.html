@@ -48,6 +48,8 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 .rect-library .txt{text-align:center}
 .rect-library .txt h2{font-size:var(--fs-title);font-weight:900;line-height:1.1}
 .rect-library .txt p{font-size:var(--fs-subtitle);opacity:.85;margin-top:2px}
+.rect-library .txt *{font-size:inherit !important;font-family:inherit !important;color:inherit !important;line-height:inherit !important}
+.rect-library .txt h2{font-size:var(--fs-title);font-weight:900;line-height:1.1}
 /* Left = Info Screen brand */
 .rect-infoscreen{width:100%;height:100%;background:linear-gradient(160deg,#e8c274,#d9a441);color:#0e1b17;flex-direction:column;gap:clamp(2px,.3vw,6px);box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.6)}
 .rect-infoscreen .is-icon{font-size:clamp(20px,3vw,44px);font-weight:900;line-height:1;font-family:system-ui,sans-serif}
@@ -83,6 +85,9 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 .news-card .badge.b-green{background:linear-gradient(135deg,var(--green),var(--green-dark))}
 .news-card .badge.b-purple{background:linear-gradient(135deg,var(--purple),var(--purple-dark))}
 .news-card .txt{font-size:var(--fs-news-card);font-weight:600;color:#1e293b;line-height:1.35}
+.news-card .txt *{font-size:inherit !important;font-family:inherit !important;color:inherit !important;line-height:inherit !important;font-weight:inherit !important}
+.news-card .txt b,.news-card .txt strong{font-weight:700 !important}
+.news-card .txt i,.news-card .txt em{font-style:italic !important}
 .news-card .src{font-size:clamp(.6rem,.9vw,.85rem);font-weight:800;margin-bottom:2px;color:var(--purple-dark)}
 .news-card .event-date{display:inline-block;background:#fef3c7;color:#92400e;font-size:clamp(.6rem,.85vw,.75rem);font-weight:700;padding:2px 8px;border-radius:6px;margin-top:4px}
 .news-bar{position:fixed;bottom:0;left:0;right:0;height:var(--bar-h);display:flex;align-items:center;gap:clamp(8px,1vw,16px);border-radius:0;background:linear-gradient(135deg,var(--green),var(--green-dark));box-shadow:0 4px 14px rgba(0,0,0,.10);padding:0 clamp(10px,1.3vw,24px);overflow:hidden;z-index:10}
