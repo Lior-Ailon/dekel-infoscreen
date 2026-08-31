@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="2.2-fontsize-colors">
+<meta name="version" content="2.3-real-upload">
 <title>Info Screen · ניהול מסכים דיגיטליים</title>
 <link rel="icon" href="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -335,6 +335,7 @@ tr:hover td{background:rgba(47,107,87,.05)}
    קונפיגורציה
    ========================================================= */
 const API_BASE  = 'https://base44.app/api/apps/69f63b4536d7a2c6688403df/functions';
+const UPLOAD_URL = API_BASE + '/libraryFileUpload';
 const DISPLAY_URL = location.origin + location.pathname.replace(/index\.html$/,'') + 'display.html';
 const REHOVOT_LIB_ID = '6a7cc19fa127f9005c2b4f3f';
 function getDisplayUrl(libId){
@@ -775,36 +776,42 @@ async function handleFileUpload(input){
   status.textContent = 'מעלה...';
   status.style.color = '#f59e0b';
   try{
-    // For images: compress and convert to base64 data URL
-    // For videos: convert to base64 data URL (size permitting)
+    if(file.size > 10*1024*1024){
+      status.textContent = 'קובץ גדול מדי (מקס 10MB)';
+      status.style.color = '#ef4444';
+      input.value = '';
+      return;
+    }
+    let uploadBlob = file;
     if(file.type.startsWith('image/')){
-      if(file.size > 10*1024*1024){ status.textContent = 'תמונה גדולה מדי (מקס 10MB)'; status.style.color = '#ef4444'; input.value=''; return; }
-      const dataUrl = await compressImg(file, 2400, 0.92);
-      urlField.value = dataUrl;
-      status.textContent = 'תמונה מוכנה ✓';
-      status.style.color = '#22c55e';
-    } else if(file.type.startsWith('video/')){
-      if(file.size > 10*1024*1024){
-        status.textContent = 'סרטון גדול מדי (מקס 10MB)';
-        status.style.color = '#ef4444';
-        input.value = '';
-        return;
-      }
-      const dataUrl = await fileToBase64(file);
-      urlField.value = dataUrl;
-      status.textContent = 'סרטון מוכן ✓';
-      status.style.color = '#22c55e';
-    } else {
+      uploadBlob = await compressImgToBlob(file, 2400, 0.92);
+    } else if(!file.type.startsWith('video/')){
       status.textContent = 'סוג קובץ לא נתמך';
       status.style.color = '#ef4444';
+      input.value = '';
+      return;
+    }
+    const fd = new FormData();
+    fd.append('file', uploadBlob, file.name);
+    const r = await fetch(UPLOAD_URL, { method:'POST', body: fd });
+    const j = await r.json();
+    if(j.success && j.file_url){
+      urlField.value = j.file_url;
+      status.textContent = (file.type.startsWith('image/')?'תמונה מוכנה ✓':'סרטון מוכן ✓');
+      status.style.color = '#22c55e';
+    } else {
+      status.textContent = 'שגיאה בהעלאה: ' + (j.error||'לא ידוע');
+      status.style.color = '#ef4444';
+      input.value = '';
     }
   }catch(e){
     status.textContent = 'שגיאה בהעלאה';
     status.style.color = '#ef4444';
+    input.value = '';
   }
 }
 
-function compressImg(file, maxW, quality){
+function compressImgToBlob(file, maxW, quality){
   return new Promise((res,rej)=>{
     const reader = new FileReader();
     reader.onload = (e)=>{
@@ -815,20 +822,11 @@ function compressImg(file, maxW, quality){
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        res(canvas.toDataURL('image/jpeg', quality));
+        canvas.toBlob((blob)=> blob ? res(blob) : rej(new Error('compress failed')), 'image/jpeg', quality);
       };
       img.onerror = rej;
       img.src = e.target.result;
     };
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
-  });
-}
-
-function fileToBase64(file){
-  return new Promise((res,rej)=>{
-    const reader = new FileReader();
-    reader.onload = (e)=> res(e.target.result);
     reader.onerror = rej;
     reader.readAsDataURL(file);
   });
