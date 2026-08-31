@@ -221,17 +221,25 @@ async function loadContent(){
 setInterval(loadContent, 60000);
 function renderLibrary(items){
   if(!items||items.length===0)items=CONTENT.new_in_library;
-  const html=items.map(item=>{
+  // Build one card
+  function buildCard(item){
     const badge='b-'+(item.badge_color||'blue');
     const dateHtml=item.event_date?'<div class="event-date">📅 '+item.event_date+'</div>':'';
     const descHtml=item.description?'<div class="txt">'+item.title+'</div><div style="font-size:var(--fs-news-desc);color:#64748b;margin-top:2px;line-height:1.4">'+item.description+'</div>'+dateHtml:'<div class="txt">'+item.title+'</div>'+dateHtml;
     return '<div class="news-card"><div class="badge '+badge+'">'+(item.icon||'📚')+'</div><div>'+descHtml+'</div></div>';
-  }).join('');
+  }
+  // If few items, repeat them to fill at least ~12 slots before duplicating
+  let filled = items.slice();
+  while(filled.length < 12) filled = filled.concat(items);
+  const html = filled.map(buildCard).join('');
+  // Duplicate for seamless infinite scroll (animate to -50%)
   document.getElementById('newsScroll').innerHTML=html+html;
 }
 function renderPositiveNews(items){
   if(!items||items.length===0)items=CONTENT.positive_news;
-  const html=items.map(item=>'<div class="news-item"><span class="dot"></span><span>'+item.title+'</span></div>').join('');
+  let filled=items.slice();
+  while(filled.length<20) filled=filled.concat(items);
+  const html=filled.map(item=>'<div class="news-item"><span class="dot"></span><span>'+item.title+'</span></div>').join('');
   document.getElementById('newsTrack').innerHTML=html+html;
 }
 function renderPhotos(items){
