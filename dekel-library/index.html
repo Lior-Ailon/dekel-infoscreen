@@ -730,7 +730,14 @@ async function formPhoto(id){
   showModal(`
     <h2>${id?'עריכת':'הוספת'} תמונה/סרטון</h2>
     <div class="fg"><label>כותרת (מופיעה מתחת לתמונה)</label><input id="ph_title" value="${esc(r.title||'')}" placeholder="שעת סיפור לילדים"></div>
-    <div class="fg"><label>קישור לתמונה או סרטון (URL)</label><input id="ph_url" value="${esc(r.image_url||'')}" dir="ltr" placeholder="https://… (תמונה: jpg/png, סרטון: mp4)"></div>
+    <div class="fg">
+      <label>העלאת תמונה או סרטון מהמכשיר</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="file" id="ph_file" accept="image/*,video/*" style="flex:1;padding:8px;border:2px dashed var(--teal,#0d9488);border-radius:8px;font-size:14px;cursor:pointer;background:#f8fafc" onchange="handleFileUpload(this)">
+        <span id="ph_upload_status" style="font-size:13px;color:var(--ink-soft);white-space:nowrap"></span>
+      </div>
+    </div>
+    <div class="fg"><label>או הזן קישור (URL) ידנית</label><input id="ph_url" value="${esc(r.image_url||'')}" dir="ltr" placeholder="https://… (תמונה: jpg/png, סרטון: mp4)"></div>
     <div class="fg"><label>תיאור (אופציונלי)</label><textarea id="ph_desc" placeholder="טקסט נוסף">${esc(r.description||'')}</textarea></div>
     <p style="color:var(--ink-soft);font-size:.85rem;margin-bottom:10px">תמונות: jpg, png, gif | סרטונים: mp4, webm, mov — המערכת מזהה אוטומטית</p>
     <div class="fg"><label>סטטוס</label><select id="ph_status">
@@ -739,6 +746,72 @@ async function formPhoto(id){
     </select></div>
     <div class="facts"><button class="btn-save" onclick="savePhoto('${id||''}')">שמור</button>
       <button class="btn-cancel" onclick="closeModal()">ביטול</button></div>`);
+}
+
+async function handleFileUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  const status = document.getElementById('ph_upload_status');
+  const urlField = document.getElementById('ph_url');
+  status.textContent = 'מעלה...';
+  status.style.color = '#f59e0b';
+  try{
+    // For images: compress and convert to base64 data URL
+    // For videos: convert to base64 data URL (size permitting)
+    if(file.type.startsWith('image/')){
+      const dataUrl = await compressImg(file, 1600, 0.8);
+      urlField.value = dataUrl;
+      status.textContent = 'תמונה מוכנה ✓';
+      status.style.color = '#22c55e';
+    } else if(file.type.startsWith('video/')){
+      if(file.size > 15*1024*1024){
+        status.textContent = 'סרטון גדול מדי (מקס 15MB)';
+        status.style.color = '#ef4444';
+        input.value = '';
+        return;
+      }
+      const dataUrl = await fileToBase64(file);
+      urlField.value = dataUrl;
+      status.textContent = 'סרטון מוכן ✓';
+      status.style.color = '#22c55e';
+    } else {
+      status.textContent = 'סוג קובץ לא נתמך';
+      status.style.color = '#ef4444';
+    }
+  }catch(e){
+    status.textContent = 'שגיאה בהעלאה';
+    status.style.color = '#ef4444';
+  }
+}
+
+function compressImg(file, maxW, quality){
+  return new Promise((res,rej)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = rej;
+      img.src = e.target.result;
+    };
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=> res(e.target.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
 }
 
 async function savePhoto(id){
