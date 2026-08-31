@@ -88,7 +88,7 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 .news-bar{position:fixed;bottom:0;left:0;right:0;height:var(--bar-h);display:flex;align-items:center;gap:clamp(8px,1vw,16px);border-radius:0;background:linear-gradient(135deg,var(--green),var(--green-dark));box-shadow:0 4px 14px rgba(0,0,0,.10);padding:0 clamp(10px,1.3vw,24px);overflow:hidden;z-index:10}
 .news-label{display:flex;align-items:center;gap:6px;flex-shrink:0;color:#fff;font-weight:800;font-size:var(--fs-ticker-label);border-left:2px solid rgba(255,255,255,.3);padding-left:clamp(8px,1vw,14px)}
 .news-ticker{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;direction:ltr}
-.news-track{display:flex;gap:clamp(20px,2.5vw,40px);white-space:nowrap;direction:ltr;animation:tickerLTR 60s linear infinite}
+.news-track{display:flex;gap:clamp(20px,2.5vw,40px);white-space:nowrap;direction:ltr;animation:tickerLTR 80s linear infinite}
 .news-track:hover{animation-play-state:paused}
 @keyframes tickerLTR{from{transform:translateX(0%)}to{transform:translateX(-50%)}}
 .news-item{display:inline-flex;align-items:center;gap:8px;color:#fff;font-size:var(--fs-ticker);font-weight:500;direction:rtl}
