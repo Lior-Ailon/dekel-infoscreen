@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="2.1-upload">
+<meta name="version" content="2.2-fontsize-colors">
 <title>Info Screen · ניהול מסכים דיגיטליים</title>
 <link rel="icon" href="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -676,6 +676,15 @@ async function formSection(section,id){
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('bold')" title="מודגש"><b>B</b></button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('italic')" title="נטוי"><i>I</i></button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('underline')" title="קו תחתות"><u>U</u></button>
+        <select class="rte-btn" style="padding:4px 8px;border:1px solid var(--paper-edge);border-radius:6px;background:#fff;font-size:13px;cursor:pointer" onchange="document.execCommand('fontSize',false,this.value);this.selectedIndex=0" title="גודל פונט">
+          <option value="">גודל</option>
+          <option value="2">קטן</option>
+          <option value="3">רגיל</option>
+          <option value="4">בינוני</option>
+          <option value="5">גדול</option>
+          <option value="6">גדול מאוד</option>
+          <option value="7">ענק</option>
+        </select>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')" title="רשימה">• רשימה</button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('insertOrderedList')" title="רשימה ממוספרת">1. רשימה</button>
         <button type="button" class="rte-btn" onclick="event.stopPropagation();toggleIconPicker('descPicker')" title="הוסף אייקון">😀</button>
@@ -697,6 +706,12 @@ async function formSection(section,id){
         <option value="orange" ${r.badge_color==='orange'?'selected':''}>כתום</option>
         <option value="green" ${r.badge_color==='green'?'selected':''}>ירוק</option>
         <option value="purple" ${r.badge_color==='purple'?'selected':''}>סגול</option>
+        <option value="red" ${r.badge_color==='red'?'selected':''}>אדום</option>
+        <option value="teal" ${r.badge_color==='teal'?'selected':''}>טורקיז</option>
+        <option value="pink" ${r.badge_color==='pink'?'selected':''}>ורוד</option>
+        <option value="gold" ${r.badge_color==='gold'?'selected':''}>זהב</option>
+        <option value="navy" ${r.badge_color==='navy'?'selected':''}>כחול כהה</option>
+        <option value="coral" ${r.badge_color==='coral'?'selected':''}>אלמוג</option>
       </select></div>
     </div>`:''}
     <div class="fg"><label>סטטוס</label><select id="sc_status">
@@ -763,13 +778,14 @@ async function handleFileUpload(input){
     // For images: compress and convert to base64 data URL
     // For videos: convert to base64 data URL (size permitting)
     if(file.type.startsWith('image/')){
-      const dataUrl = await compressImg(file, 1600, 0.8);
+      if(file.size > 10*1024*1024){ status.textContent = 'תמונה גדולה מדי (מקס 10MB)'; status.style.color = '#ef4444'; input.value=''; return; }
+      const dataUrl = await compressImg(file, 2400, 0.92);
       urlField.value = dataUrl;
       status.textContent = 'תמונה מוכנה ✓';
       status.style.color = '#22c55e';
     } else if(file.type.startsWith('video/')){
-      if(file.size > 15*1024*1024){
-        status.textContent = 'סרטון גדול מדי (מקס 15MB)';
+      if(file.size > 10*1024*1024){
+        status.textContent = 'סרטון גדול מדי (מקס 10MB)';
         status.style.color = '#ef4444';
         input.value = '';
         return;
