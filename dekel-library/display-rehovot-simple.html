@@ -203,7 +203,7 @@ updateClock();setInterval(updateClock,1000);
 const API_URL='https://app.base44.com/api/apps/69f63b4536d7a2c6688403df/functions/getLibraryContent';
 async function loadContent(){
   try{
-    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({library_id:'rehovot'}),signal:AbortSignal.timeout(5000)});
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({library_id:'rehovot',_t:Date.now()}),signal:AbortSignal.timeout(5000)});
     const result=await res.json();
     if(result.success&&result.data){
       const d=result.data;
@@ -217,12 +217,14 @@ async function loadContent(){
   renderPositiveNews(CONTENT.positive_news);
   renderPhotos(CONTENT.photos);
 }
+// Auto-refresh every 60 seconds
+setInterval(loadContent, 60000);
 function renderLibrary(items){
   if(!items||items.length===0)items=CONTENT.new_in_library;
   const html=items.map(item=>{
     const badge='b-'+(item.badge_color||'blue');
     const dateHtml=item.event_date?'<div class="event-date">📅 '+item.event_date+'</div>':'';
-    const descHtml=item.description?'<div class="txt">'+item.title+'</div><div style="font-size:var(--fs-news-desc);color:#64748b;margin-top:2px">'+item.description+'</div>'+dateHtml:'<div class="txt">'+item.title+'</div>'+dateHtml;
+    const descHtml=item.description?'<div class="txt">'+item.title+'</div><div style="font-size:var(--fs-news-desc);color:#64748b;margin-top:2px;line-height:1.4">'+item.description+'</div>'+dateHtml:'<div class="txt">'+item.title+'</div>'+dateHtml;
     return '<div class="news-card"><div class="badge '+badge+'">'+(item.icon||'📚')+'</div><div>'+descHtml+'</div></div>';
   }).join('');
   document.getElementById('newsScroll').innerHTML=html+html;

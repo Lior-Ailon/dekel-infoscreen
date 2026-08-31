@@ -248,6 +248,12 @@ tr:hover td{background:rgba(47,107,87,.05)}
 .rte-editor b,.rte-editor strong{font-weight:700}
 .rte-editor i,.rte-editor em{font-style:italic}
 .rte-editor:empty:before{content:attr(data-placeholder);color:#94a3b8;pointer-events:none}
+
+.icon-picker{display:none;position:absolute;background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:10000;max-width:340px;max-height:220px;overflow-y:auto}
+.icon-picker.open{display:flex;flex-wrap:wrap;gap:6px}
+.icon-pick{font-size:1.5rem;cursor:pointer;padding:6px;border-radius:6px;transition:.15s;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.icon-pick:hover{background:#e2e8f0;transform:scale(1.15)}
+.icon-cat{font-size:.75rem;color:#94a3b8;width:100%;margin-top:8px;margin-bottom:2px;font-weight:600}
 </style>
 </head>
 <body>
@@ -385,9 +391,10 @@ const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2600); }
 function showModal(html){ $('modalBody').innerHTML=html; $('modal').classList.add('on'); }
 
-function toggleEmojiPalette(e){e.preventDefault();e.stopPropagation();const p=$('emojiPalette');p.classList.toggle('open');}
-function insertEmoji(emoji){const ed=$('sc_desc');ed.focus();document.execCommand('insertText',false,emoji);$('emojiPalette').classList.remove('open');}
-document.addEventListener('click',e=>{if(!e.target.closest('.rte-emoji-palette')&&!e.target.closest('.rte-btn')){const p=$('emojiPalette');if(p)p.classList.remove('open');}});
+function toggleIconPicker(id){const p=$(id);if(!p)return;document.querySelectorAll('.icon-picker.open').forEach(el=>{if(el.id!==id)el.classList.remove('open');});p.classList.toggle('open');}
+function insertIconToInput(inputId,icon){const inp=$(inputId);if(!inp)return;const start=inp.selectionStart||inp.value.length;const end=inp.selectionEnd||inp.value.length;inp.value=inp.value.slice(0,start)+icon+inp.value.slice(end);inp.focus();inp.setSelectionRange(start+icon.length,start+icon.length);$(inputId==='sc_title'?'titlePicker':inputId==='sc_icon'?'iconPicker':'descPicker').classList.remove('open');}
+function insertIconToEditor(editorId,icon){const ed=$(editorId);if(!ed)return;ed.focus();document.execCommand('insertText',false,icon);$('descPicker').classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.icon-picker')&&!e.target.closest('.rte-btn')){document.querySelectorAll('.icon-picker.open').forEach(el=>el.classList.remove('open'));}});
 
 function closeModal(){ $('modal').classList.remove('on'); }
 function openLogin(){ $('loginModal').classList.add('on'); setTimeout(()=>$('lgUser').focus(),80); }
@@ -636,25 +643,37 @@ async function formSection(section,id){
   let r={};
   if(id){ const rows=await loadSection(section); r=rows.find(x=>x.id===id)||{}; }
   const isNews = section==='positive_news';
+  const ICONS = ['📚','📖','✍️','📝','🎨','🎭','🎪','🎬','🎤','🎵','🎶','🎸','🥁','🎹','🪕','🎻','🏆','🥇','🏅','🎁','🎉','✨','⭐','🌟','💎','🔥','💡','📌','📍','🔑','🔍','🔬','🧪','⚗️','🧬','💻','📱','🌐','🖥️','⌨️','🖱️','💾','💿','🎮','🕹️','🎲','🧩','🃏','🀄','♟️','🎯','🎳','⛳','⚽','🏀','🏈','⚾','🎾','🏐','🏉','🏒','🏓','🏸','🥊','🥋','🤿','🏊','🏄','🚴','🏃','🧗','🤸','🧘','🏋️','🤼','🤾','🏌️','🏇','🤺','⛷️','🏂','🪂','🛷','⛸️','🚗','🚕','🚙','🚌','🚎','🚓','🚑','🚒','🚐','🚚','🚛','✈️','🛫','🛬','🚂','🚆','🚊','🚇','🚢','⛵','🚤','🛳️','⚓','🚁','🚀','🛸','🛰️',' satellite ','🛤️','🛣️','⛽','🚦','🚧','🏠','🏡','🏢','🏬','🏭','🏗️','🏙️','🏘️','邸','🏛️','🏰','🏯','🗼','🗽','⛪','🕌','🕍','⛩️','🕋','⛺','🏖️','🏔️','🌋','⛰️','🏕️','🏜️','🏝️','🏞️','🌅','🌄','🌇','🌆','🌃','🌉','🌌','🌠','☀️','🌤️','⛅','🌥️','☁️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','☃️','⛄','🌪️','🌫️','🌈','🌊','💧','🔥','💥','💫','⭐','🌟','✨','⚡','☄️','💥','💢','💦','💨','🕳️','💣','💬','💭','🗯️','🗨️','📢','📣','🔔','🔕','🎵','🎶','🎼','🎤','🎧','📻','🎷','🎸','🎹','🎺','🎻','🪕','🥁','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','💽','💾','💿','📀','🎥','🎞️','📽️','🎬','📺','📷','📸','📹','📼','🔍','🔎','🔬','🔭','📡','💡','🔦','🕯️','📔','📕','📖','📗','📘','📙','📚','📓','📒','fas','📃','📜','📄','📰','🗞️','📑','🔖','🏷️','✏️',' pencil2 ','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋','📌','📍','📎','🖇️','📏','📐','✂️','🗃️','🗄️','🗑️','🔒','🔓','🔏','🔐','🔑','🗝️','🔨','🪓','⛏️','⚒️','🛠️','🗡️','⚔️','🔫','🏹','🛡️','🔧','🪛','🔩','⚙️','🗜️','⚖️','🦯','🔗','⛓️','🧰','🧲','⚗️','🧪','🧫','🧬','🔬','🔭','📡','💉','🩸','💊','🩹','🩺','🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🧯','🛒','🚬','⚰️','⚱️','🗿','🏧','🚮','🚰','♿','🚹','🚺','🚻','🚼','🚾','🛂','🛃','🛄','🛅','⚠️','🚸','⛔','🚫','🚳','🚭','🚯','🚱','🚷','📵','🔞','☢️','☣️','⭕','✅','☑️','✔️','❌','❎','➕','➖','➗','✖️','💯','❗','❓','❕','❔','‼️','⁉️','🔅','🔆','〽️','⚠️','🚸','🔱','⚜️','🔰','♻️','✅','❇️','✳️','❎','🌐','Ⓜ️','🌀','💤','🏧','🚾','♿','🅿️','🈳','🈂️','🛂','🛃','🛄','🛅','🚹','🚺','🚻','🚼','🚮','🚰','🚱','🚫','🔞','🚭','🚯','🚱','🚷','📵','🚸','⛔','✳️','❇️','❎','✅','✔️','☑️','❌','❗','❓','❕','❔','‼️','⁉️','🔅','🔆','〽️','⚠️','🚸','🔱','⚜️','🔰','♻️','✅','❇️','✳️','❎','😍','🤩','😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😘','😗','☺️','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','🥸','🤥','😏','😒','🙄','😬','😮‍💨','🤥','😶‍🌫️',' Shelley ','🫗','🫛','🫚','🫙','🫠','🫡','🫢','🫣','🫤','🫥','🫶','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','👁️‍🗨️','🗨️','🗯️','💭','💤','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🧠','🫀','🫁','🦷','🦴','👀','👁️','👅','👄','💋','🧒','👦','👧','🧑','👨','👩','🧓','👴','👵','👲','👳','🧔','🧕','👨‍🦰','👩‍🦰','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','👨‍🦲','👩‍🦲','👱','👨‍🦳','👱‍♀️','👶','🧙','🧚','🧛','🧜','🧝','🧞','🧟','🧞‍♂️','🧞‍♀️','💆','💇','🚶','🧍','🧎','🏃','💃','🕺','👯','🧖','🧗','🧘','🛀','🛌','🕴️','🗣️','👤','👥','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','⛹️','🏋️','🚴','🚵','🏎️','🏍️','🤸','🤼','🤽','🤾','🤹','🎭','🧑‍🎨','🎨','🖼️','🧵','🧶','🪡','🪢','👓','🕶️','🥽','🥼','🦺','👔','👕','👖','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳','👙','👚','🪗','👛','👜','👝','🛍️','🎒','👞','👟','🥾','🥿','👠','👡','🩰','👢','👑','👒','🎩','🎓','🧢','⛑️','📿','💄','💍','💎','🔇','🔈','🔊','🔉','🔔','🔕','🎵','🎶','〽️','✔️','✖️','➕','➖','➗','=️','∞','💯','❗','❓','❕','❔','‼️','⁉️','🔅','🔆','☢️','☣️','⛔','✅','❌','❎','🔄','🔃','🔝','🔚','🔙','🔛','🔜','📅','📆','🗓️','⏰','⏳','⌛','⏱️','⏲️','🕰️','🕛','🕧','🕐','🕜','🕑','🕝','🕒','🕞','🕓','🕟','🕔','🕠','🕕','🕡','🕖','🕢','🕗','🕣','🕘','🕤','🕙','🕥','🕚','🕦','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🐚','🌾','💐','🌷','🌹','🥀','🌺','🌸','🌼','🌻','🌞','🌻','🌛','🌜','🌚','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🌙','🌎','🌍','🌏','🪐','☄️','⭐','🌟','✨','⚡','💥','🔥','🌪️','🌈','☀️','⛅','☁️','🌧️','⛈️','🌨️','❄️','💧','🌊','💨','😺','😸','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🦮','🐕‍🦺','🐩','🐺','🦊','🦝','🐱','🐈','🐈‍⬛','🦁','🐯','🐅','🐆','🐴','🐎','🦄','🦓','🦌','🦬','🐮','🐂','🐃','🐄','🐷','🐖','🐗','🐽','🐏','🐑','🐐','🐪','🐫','🦙','🦒','🐘','🦣','🦏','🦛','🐭',' mice ','🐁','🐀','🐹','🐰','🐇','🐿️','🦫','🦔','🦇','🐻','🐻‍❄️','🐨','🐼','🦥','🦦','🦨','🦘','🦡','🐾','🦃','🐔','🐓','🐣','🐤','🐥','🐦','🐧','🕊️','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🦖','🐳','🐋','🐬','🦭','🐟','🐠','🐡','🦈','🐙','🐚','🐌','🦋','🐛','🐜','🐝','🐞','🦗','🕷️','🕸️','🦂','🦟','🪰','🪱','🦠','💐','🌸','💮','🏵️','🌹','🥀','🌺','🌻','🌼','🌷','🌱','🌲','🌳','🌴','🌵','🌾','🌿','☘️','🍀','🍁','🍂','🍃','🍇','🍈','🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔','🥕','🌽','🌶️','🫑','🥒','🥬','🥦','🧄','🧅','🍄','🥜','🌰','🍞','🥐','🥖','🫓','🥨','🥯','🥞','🧇','🧈','🥓','🥩','🍗','🍖','🦴','🌭','🍔','🍟','🍕','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','🫖','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','🥄','🍴','🍽️','🥣','🥡','🥢','🧂','⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🥌','🎿','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖️','🏵️','🎗️','🎫','🎟️','🎪','🤹','🎭','🩰','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🎷','🎺','🪕','🎸','🪘','🎻','🎲','♟️','🎯','🎳','🎮','🎰','🧩','🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🦯','🦽','🦼','🛴','🚲','🛵','🏍️','🛺','🚨','🚔','🚍','🚘','🚖','🚡','🚠','🚟','🚃','🚋','🚞','🚝','🚄','🚅','🚈','🚂','🚆','🚇','🚊','🚉','✈️','🛫','🛬','🛩️','💺','🛰️','🚀','🛸','🚁','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🪝','⛽','🚧','🚦','🚥','🚏','🗺️','🗿','🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','富士山','🏕️','⛺','🛖','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌','🕍','🕋','⛩️','🛕','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌉','🌌','🎠','🎡','🎢','💈','🎪','🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔','🚕','🚖','🚗','🚘','🚙','🚚','🚛','🚜','🚝','🏎️','🏍️','🛵','🦽','🦼','🛺','🚲','🛴','🛹','🚏','🛣️','🛤️','🛢️','⛽','🚨','🚥','🚦','🛑','⚓','⛵','🛶','🚤','🛳️','⛴️','🛥️','🚢','✈️','🛩️','🛫','🛬','🪂','💺','🚁','🚟','🚠','🚡','🛰️','🚀','🛸','🛎️','🧳','⌛','⏳','⌚','⏰','⏱️','⏲️','🕰️','🕛','🕧','🕐','🕜','🕑','🕝','🕒','🕞','🕓','🕟','🕔','🕠','🕕','🕡','🕖','🕢','🕗','🕣','🕘','🕤','🕙','🕥','🕚','🕦','🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙','🌚','🌛','🌜','🌡️','☀️','🌝','🌞','🪐','⭐','🌟','🌠','🌌','☁️','⛅','⛈️','🌤️','🌥️','🌦️','🌧️','🌨️','🌩️','🌪️','🌫️','🌬️','🌀','🌈','🌂','☂️','☔','⛱️','⚡','❄️','☃️','⛄','☄️','🔥','💧','🌊']
   showModal(`
     <h2>${id?'עריכה':'פריט חדש'} · ${isNews?'חדשות טובות':'חדש בספרייה'}</h2>
-    <div class="fg"><label>כותרת</label><input id="sc_title" value="${esc(r.title||'')}" placeholder="${isNews?'מחקר חדש: תוחלת חיים בעלייה':'סופר עמוס עומד להגיע'}"></div>
+    <div class="fg"><label>כותרת</label>
+      <div style="display:flex;gap:6px;align-items:center;position:relative">
+        <input id="sc_title" value="${esc(r.title||'')}" placeholder="${isNews?'מחקר חדש: תוחלת חיים בעלייה':'סופר עמוס עומד להגיע'}" style="flex:1">
+        <button type="button" class="rte-btn" onclick="event.stopPropagation();toggleIconPicker('titlePicker')" title="בחר אייקון">😀</button>
+        <div class="icon-picker" id="titlePicker">${ICONS.map(e=>`<span class="icon-pick" onclick="insertIconToInput('sc_title','${e}')">${e}</span>`).join('')}</div>
+      </div>
+    </div>
     ${!isNews?`<div class="fg" style="position:relative"><label>תיאור (עם עיצוב)</label>
       <div class="rte-toolbar">
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('bold')" title="מודגש"><b>B</b></button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('italic')" title="נטוי"><i>I</i></button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('underline')" title="קו תחתות"><u>U</u></button>
         <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')" title="רשימה">• רשימה</button>
-        <button type="button" class="rte-btn" onmousedown="event.preventDefault();toggleEmojiPalette(event)" title="אמוג'י">😀</button>
-        <div class="rte-emoji-palette" id="emojiPalette">
-          ${['😀','😍','🤩','🎉','📚','✨','⭐','🔥','💡','📌','❤️','👍','🏆','🎁','🌟','📖','✅','⚡','🎨',' music ','🎤','🥳','😎','🤔','💪','🙏','🌻','🌈','📝','🔔','💎','🎯','🚀','🎪','🎨','📸','🎬','🍿','☕','🍕','🎂','🎈','🏆','🥇','📚','✏️','🖍️','💡','🔑','📱','💻','🌐','GPS','📍','🗓️','⏰','💰','📈','📊','🔍','🧩','🎲','🃏','🎮','🏆','🥁','🎸','🎵','🎶','🎼','🎤','🎧','🎨','🎭','🎪','🎬','🎟️','🎫','🎠','🎡','🎢','🎣','🤿','🏊','🏄','🧗','🚴','🏃','🧘','🤸','🤾','🏌️','🎾','🏏','⚾','⚽','🏀','🏈','🏉','🏐','🥏','🏓','🏸','🥅','🏒','🏑','🥍','🎯','⛳','🏹','🎣','🥊','🥋','🎽','⛸️','🛷','🎿','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺',' gymnastics ','🤹','🎪','🎭','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🪘','🎷','🎺','🎸','🪕','🎻','🎲','🧩','🃏','🀄','♟️','🎯','🎳','🎮','🎰','🧩','🎲'].map(e=>`<span class="rte-emoji" onclick="insertEmoji('${e}')">${e}</span>`).join('')}
-        </div>
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault();document.execCommand('insertOrderedList')" title="רשימה ממוספרת">1. רשימה</button>
+        <button type="button" class="rte-btn" onclick="event.stopPropagation();toggleIconPicker('descPicker')" title="הוסף אייקון">😀</button>
+        <div class="icon-picker" id="descPicker">${ICONS.map(e=>`<span class="icon-pick" onclick="insertIconToEditor('sc_desc','${e}')">${e}</span>`).join('')}</div>
       </div>
-      <div class="rte-editor" id="sc_desc" contenteditable="true" data-placeholder="כמה מילים שיופיעו על המסך — אפשר להשתמש בעיצוב">${r.description||''}</div>
+      <div class="rte-editor" id="sc_desc" contenteditable="true" data-placeholder="כמה מילים שיופיעו על המסך — אפשר להשתמש בעיצוב ואייקונים">${r.description||''}</div>
     </div>`:''}
     ${!isNews?`<div class="fg"><label>תאריך (אופציונלי)</label><input id="sc_date" value="${esc(r.event_date||'')}" placeholder="15.09.2026"></div>`:''}
     ${!isNews?`<div class="frow">
-      <div class="fg"><label>אייקון (אמוג'י)</label><input id="sc_icon" value="${esc(r.icon||'📚')}" placeholder="📚"></div>
+      <div class="fg"><label>אייקון (אמוג'י)</label>
+        <div style="display:flex;gap:6px;align-items:center;position:relative">
+          <input id="sc_icon" value="${esc(r.icon||'📚')}" placeholder="📚" style="flex:1">
+          <button type="button" class="rte-btn" onclick="event.stopPropagation();toggleIconPicker('iconPicker')" title="בחר אייקון">😀</button>
+          <div class="icon-picker" id="iconPicker">${ICONS.map(e=>`<span class="icon-pick" onclick="insertIconToInput('sc_icon','${e}')">${e}</span>`).join('')}</div>
+        </div>
+      </div>
       <div class="fg"><label>צבע תג</label><select id="sc_badge">
         <option value="blue" ${(r.badge_color||'blue')==='blue'?'selected':''}>כחול</option>
         <option value="orange" ${r.badge_color==='orange'?'selected':''}>כתום</option>
