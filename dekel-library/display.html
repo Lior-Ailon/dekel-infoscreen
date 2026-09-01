@@ -698,13 +698,33 @@ setInterval(loadWeather,900000);
 setInterval(renderHours,3600000);
 /* ===== ניקוי מטמון ===== */
 function clearCache(){
-  if("caches" in window){
-    caches.keys().then(ns=>ns.forEach(n=>caches.delete(n)));
+  /* משוב חזותי — מסך טעינה */
+  var ov=document.createElement("div");
+  ov.style.cssText="position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:Heebo,sans-serif";
+  ov.innerHTML='<div style="width:48px;height:48px;border:4px solid #2f6b57;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div><div style="color:#1e4a3d;font-size:1.2rem;font-weight:700">מנקה מטמון…</div><div style="color:#666;font-size:.9rem">הדף יטען מחדש בעוד רגע</div>';
+  if(!document.getElementById("spinKf")){
+    var s=document.createElement("style");
+    s.id="spinKf";
+    s.textContent="@keyframes spin{to{transform:rotate(360deg)}}";
+    document.head.appendChild(s);
   }
-  if(window.sessionStorage) sessionStorage.clear();
-  var u=new URL(location.href);
-  u.searchParams.set("_cb",Date.now());
-  location.href=u.toString();
+  document.body.appendChild(ov);
+
+  /* ניקוי מלא */
+  try{
+    if("caches" in window){
+      caches.keys().then(function(ns){ns.forEach(function(n){caches.delete(n);});});
+    }
+    if(window.sessionStorage) sessionStorage.clear();
+    if(window.localStorage) localStorage.clear();
+  }catch(e){}
+
+  /* השהייה קצרה כדי שהמשתמש יראה את המסך */
+  setTimeout(function(){
+    var u=new URL(location.href);
+    u.searchParams.set("_cb",Date.now());
+    location.href=u.toString();
+  },800);
 }
 
 
