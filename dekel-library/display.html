@@ -279,7 +279,6 @@ body.eo .col.side{display:none}
       <div>
         <div class="nm" id="libName">ספרייה</div>
         <div class="tg">ידע. קהילה. השראה.</div>
-      <div class="tg" id="libAddr" style="font-size:.82rem;margin-top:2px;display:none"></div>
       </div>
     </div>
 
@@ -548,15 +547,14 @@ function api(entity){
 const MONTHS=['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
 const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 let DS = {};
-let addr = "";
 
 async function loadData(){
   const [libRes, evRes, bookRes] = await Promise.all([api('library'), api('event'), api('content')]);
 
-  let libName='הספרייה', phone='', notes='', web='', addr='';
+  let libName='הספרייה', phone='', notes='', web='';
   if(libRes.success && libRes.data && libRes.data.length){
     const l = libRes.data.find(x=>x.id===LIBRARY_ID) || libRes.data[0];
-    libName = l.name || libName; phone = l.phone || ''; notes = l.notes || ''; addr = l.address || '';
+    libName = l.name || libName; phone = l.phone || ''; notes = l.notes || '';
 
     DS = l.display_settings || {};
     if(typeof DS==='string'){ try{ DS=JSON.parse(DS); }catch(e){ DS={}; } }
@@ -601,7 +599,6 @@ async function loadData(){
 
   /* ---- כותרות ופוטר ---- */
   $('libName').textContent = libName;
-  if(addr){ $("libAddr").textContent = addr; $("libAddr").style.display="block"; }
   $('welcomeSub').textContent = 'ל' + libName;
   $('fLibName').textContent = 'קהילת ' + libName;
   $('fPhone').textContent = phone || '-';
