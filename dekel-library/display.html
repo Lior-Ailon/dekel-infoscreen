@@ -275,10 +275,11 @@ body.eo .col.side{display:none}
   <!-- ============ TOP ============ -->
   <div class="top">
     <div class="card brand">
-      <img src="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png" alt="InfoScreen" style="width:52px;height:52px;border-radius:10px;object-fit:cover">
+      <img src="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png" alt="InfoScreen" style="width:52px;height:52px;border-radius:10px;object-fit:cover;cursor:pointer" onclick="clearCache()" title="ניקוי מטמון">
       <div>
         <div class="nm" id="libName">ספרייה</div>
         <div class="tg">ידע. קהילה. השראה.</div>
+      <div class="tg" id="libAddr" style="font-size:.82rem;margin-top:2px;display:none"></div>
       </div>
     </div>
 
@@ -547,14 +548,15 @@ function api(entity){
 const MONTHS=['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
 const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 let DS = {};
+let addr = "";
 
 async function loadData(){
   const [libRes, evRes, bookRes] = await Promise.all([api('library'), api('event'), api('content')]);
 
-  let libName='הספרייה', phone='', notes='', web='';
+  let libName='הספרייה', phone='', notes='', web='', addr='';
   if(libRes.success && libRes.data && libRes.data.length){
     const l = libRes.data.find(x=>x.id===LIBRARY_ID) || libRes.data[0];
-    libName = l.name || libName; phone = l.phone || ''; notes = l.notes || '';
+    libName = l.name || libName; phone = l.phone || ''; notes = l.notes || ''; addr = l.address || '';
 
     DS = l.display_settings || {};
     if(typeof DS==='string'){ try{ DS=JSON.parse(DS); }catch(e){ DS={}; } }
@@ -599,6 +601,7 @@ async function loadData(){
 
   /* ---- כותרות ופוטר ---- */
   $('libName').textContent = libName;
+  if(addr){ $("libAddr").textContent = addr; $("libAddr").style.display="block"; }
   $('welcomeSub').textContent = 'ל' + libName;
   $('fLibName').textContent = 'קהילת ' + libName;
   $('fPhone').textContent = phone || '-';
@@ -667,6 +670,17 @@ setInterval(tick,1000);
 setInterval(loadData,60000);
 setInterval(loadWeather,900000);
 setInterval(renderHours,3600000);
+/* ===== ניקוי מטמון ===== */
+function clearCache(){
+  if("caches" in window){
+    caches.keys().then(ns=>ns.forEach(n=>caches.delete(n)));
+  }
+  if(window.sessionStorage) sessionStorage.clear();
+  var u=new URL(location.href);
+  u.searchParams.set("_cb",Date.now());
+  location.href=u.toString();
+}
+
 
 // ===== Auto resolution fit =====
 // On landscape screens (TV/desktop): scale the fixed 1920x1080 canvas to fit.
