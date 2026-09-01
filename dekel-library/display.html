@@ -205,6 +205,11 @@ body{
 .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .cover .ct{font-size:1.25rem;font-weight:800;line-height:1.3}
 .cover .ca{font-size:.9rem;opacity:.85;margin-top:8px}
+/* תמונות ברוחב מלא */
+.slide.photo{flex-direction:column;text-align:center;padding:20px 30px}
+.slide.photo .ph-title{font-size:1.4rem;font-weight:800;color:var(--green-deep);margin-bottom:12px}
+.slide.photo .ph-img{width:100%;max-height:380px;object-fit:contain;border-radius:14px;box-shadow:0 12px 28px rgba(0,0,0,.15)}
+.slide.photo .ph-frame{width:100%;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
 
 .showbar{display:flex;align-items:center;gap:12px;padding:0 24px 18px}
 .dots{display:flex;gap:7px;margin:0 auto}
@@ -512,6 +517,18 @@ function slideHTML(s){
         ${s.desc?`<p>${esc(s.desc)}</p>`:''}
         ${s.tag?`<span class="tag">${esc(s.tag)}</span>`:''}</div>${cover}`;
   }
+  if(s.type==='photo'){
+    const img = s.image
+      ? `<div class="ph-frame"><img class="ph-img" src="${esc(s.image)}" alt="${esc(s.title||'')}"></div>`
+      : '';
+    const title = s.title
+      ? `<div class="ph-title">${esc(s.title)}</div>`
+      : '';
+    const text = s.text
+      ? `<p style="font-size:1.1rem;color:var(--ink-soft);margin-top:8px">${esc(s.text)}</p>`
+      : '';
+    return `${title}${img}${text}`;
+  }
   return `<div class="txt">
       <div class="kick">${esc(s.kick||'הידעתם?')}</div>
       <h2>${esc(s.title)}</h2><div class="rule"></div>
@@ -537,10 +554,10 @@ function show(i){
 /* =========================================================
    API
    ========================================================= */
-function api(entity){
+function api(entity, section){
   return fetch(`${API_BASE}/libraryData`,{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({action:'list',entity_type:entity,session_token:'public_display',library_id:LIBRARY_ID})
+    body:JSON.stringify({action:'list',entity_type:entity,session_token:'public_display',library_id:LIBRARY_ID,data:section?{section}:null})
   }).then(r=>r.json()).catch(()=>({success:false}));
 }
 
@@ -549,7 +566,7 @@ const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שיש
 let DS = {};
 
 async function loadData(){
-  const [libRes, evRes, bookRes] = await Promise.all([api('library'), api('event'), api('content')]);
+  const [libRes, evRes, bookRes, phRes, nwRes] = await Promise.all([api('library'), api('event'), api('content'), api('content','photos'), api('content','positive_news')]);
 
   let libName='הספרייה', phone='', notes='', web='';
   if(libRes.success && libRes.data && libRes.data.length){
@@ -642,6 +659,18 @@ async function loadData(){
       e.event_time||'', e.location?'· '+e.location:''].filter(Boolean).join(' · ')}));
   QUOTES.forEach(q=>deck.push({type:'quote',...q}));
   TIPS.forEach(t=>deck.push({type:'tip',...t}));
+  /* ---- תמונות מהספרייה ---- */
+  if(phRes.success && Array.isArray(phRes.data)){
+    phRes.data.filter(p=>p.section==="photos" && p.image_url).forEach(p=>{
+      deck.push({type:"photo", title:p.title||"", image:p.image_url});
+    });
+  }
+  /* ---- חדשות טובות ---- */
+  if(nwRes.success && Array.isArray(nwRes.data)){
+    nwRes.data.filter(n=>n.section==="positive_news" && n.status!=="archived").forEach(n=>{
+      deck.push({type:"photo", title:n.title||"", image:n.image_url||"", text:n.description||""});
+    });
+  }
   buildSlides(deck);
 
   $('load').style.display='none';
