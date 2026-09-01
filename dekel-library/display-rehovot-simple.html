@@ -16,8 +16,8 @@
   --radius:clamp(10px,1.2vw,40px);
   --card-radius:clamp(8px,.8vw,24px);
   --bar-h:clamp(36px,4.5vw,100px);
-  --fs-title:clamp(1rem,3vw,6rem);
-  --fs-subtitle:clamp(.7rem,1.5vw,3rem);
+  --fs-title:clamp(1.8rem,5vw,9rem);
+  --fs-subtitle:clamp(.9rem,2vw,4rem);
   --fs-clock:clamp(1.1rem,3vw,6rem);
   --fs-clock-date:clamp(.65rem,1.2vw,2.5rem);
   --fs-icon:clamp(20px,3vw,96px);
@@ -53,9 +53,9 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 /* Left = Info Screen brand */
 .rect-infoscreen{width:100%;height:100%;background:linear-gradient(160deg,#e8c274,#d9a441);color:#0e1b17;flex-direction:column;gap:clamp(2px,.3vw,6px);box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.6)}
 .rect-infoscreen .is-icon{font-size:clamp(20px,3vw,44px);font-weight:900;line-height:1;font-family:system-ui,sans-serif}
-.rect-infoscreen .is-text{font-size:clamp(.6rem,1vw,1rem);font-weight:800;letter-spacing:.05em;line-height:1.1;text-align:center;color:#0e1b17}.rect-infoscreen .is-sub{font-size:clamp(.4rem,.6vw,.7rem);font-weight:600;letter-spacing:.1em;line-height:1;color:#1e4a3d;opacity:.8}
+.rect-infoscreen .is-text{font-size:clamp(.7rem,1.2vw,1.4rem);font-weight:800;letter-spacing:.05em;line-height:1.1;text-align:center;color:#0e1b17}.rect-infoscreen .is-sub{font-size:clamp(.5rem,.8vw,1rem);font-weight:600;letter-spacing:.1em;line-height:1;color:#1e4a3d;opacity:.8;text-align:center}
 .rect-clock .clock-num{font-size:var(--fs-clock);font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
-.rect-clock .clock-date{font-size:var(--fs-clock-date);opacity:.9}
+.rect-clock .clock-date{font-size:var(--fs-clock-date);opacity:.9;text-align:center;width:100%}
 .body-grid{flex:1;display:flex;gap:var(--gap);min-height:0;overflow:hidden;margin-top:0}
 .photo-panel{flex:1.3;border-radius:var(--radius);overflow:hidden;position:relative;background:#1e293b;box-shadow:0 6px 18px rgba(0,0,0,.12);min-height:0}
 .photo-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;display:flex;align-items:center;justify-content:center}
@@ -64,7 +64,7 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 .photo-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.5);gap:10px}
 .photo-ph .ic{font-size:var(--fs-ph-icon);opacity:.4}
 .photo-ph .t{font-size:var(--fs-ph-text);font-weight:700;color:#fff}
-.photo-cap{position:absolute;bottom:clamp(8px,1.2vw,18px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;padding:clamp(5px,.8vw,10px) clamp(12px,1.5vw,24px);border-radius:50px;font-size:var(--fs-caption);font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:nowrap;z-index:5;max-width:90%;overflow:hidden;text-overflow:ellipsis;transition:opacity .8s ease}
+.photo-cap{display:none !important}
 .photo-dots{position:absolute;top:clamp(8px,1vw,14px);left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
 .photo-dot{width:clamp(5px,.5vw,8px);height:clamp(5px,.5vw,8px);border-radius:50%;background:rgba(255,255,255,.4);transition:all .3s;cursor:pointer}
 .photo-dot.active{background:#fff;width:clamp(14px,1.3vw,24px);border-radius:4px}
