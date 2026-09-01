@@ -16,8 +16,8 @@
   --radius:clamp(10px,1.2vw,40px);
   --card-radius:clamp(8px,.8vw,24px);
   --bar-h:clamp(36px,4.5vw,100px);
-  --fs-title:clamp(3.5rem,9vw,16rem);
-  --fs-subtitle:clamp(1.2rem,2.5vw,5rem);
+  --fs-title:clamp(2rem,4.5vw,7rem);
+  --fs-subtitle:clamp(.8rem,1.5vw,3rem);
   --fs-clock:clamp(1.1rem,3vw,6rem);
   --fs-clock-date:clamp(.65rem,1.2vw,2.5rem);
   --fs-icon:clamp(20px,3vw,96px);
@@ -45,10 +45,10 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:
 .rect-library{flex:1;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;gap:clamp(8px,1vw,16px)}
 .rect-library .lib-logo{width:clamp(32px,4vw,64px);height:clamp(32px,4vw,64px);border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
 .rect-library .lib-icon{font-size:var(--fs-icon);flex-shrink:0}
-.rect-library .txt{text-align:center;font-size:var(--fs-title)}
+.rect-library .txt{text-align:center}
 .rect-library .txt h2{font-size:var(--fs-title) !important;font-weight:900 !important;line-height:1.1 !important}
 .rect-library .txt p{font-size:var(--fs-subtitle);opacity:.85;margin-top:2px}
-.rect-library .txt *{font-size:inherit !important;font-family:inherit !important;color:inherit !important;line-height:inherit !important}
+.rect-library .txt *:not(h2){font-size:inherit !important;font-family:inherit !important;color:inherit !important;line-height:inherit !important}
 .rect-library .txt h2{font-size:var(--fs-title) !important;font-weight:900 !important;line-height:1.1 !important}
 /* Left = Info Screen brand */
 .rect-infoscreen{width:100%;height:100%;background:linear-gradient(160deg,#e8c274,#d9a441);color:#0e1b17;flex-direction:column;gap:clamp(2px,.3vw,6px);box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.6)}
