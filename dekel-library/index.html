@@ -768,6 +768,67 @@ async function formPhoto(id){
       <button class="btn-cancel" onclick="closeModal()">ביטול</button></div>`);
 }
 
+
+/* --- התאמה אוטומטית של כל תמונה למסך רחב (1920x1080): contain מלא + רקע מטושטש --- */
+function loadImage(file){
+  return new Promise((res,rej)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{ const img = new Image(); img.onload = ()=>res(img); img.onerror = rej; img.src = e.target.result; };
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+function rr(ctx, x, y, w, h, r){
+  if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+async function fitImageToLandscape(file){
+  const img = await loadImage(file);
+  // כל תמונה, בכל גודל ובכל יחס — מותאמת למסגרת בשלמותה עם רקע משלים
+  const W = 1920, H = 1080, R = 36, MAX_W = 1880, MAX_H = 1030;
+  // התאמת contain: התמונה המלאה נכנסת בגבולות, בלי חיתוך
+  let FG_W = MAX_W, FG_H = Math.round(img.height * MAX_W / img.width);
+  if(FG_H > MAX_H){ FG_H = MAX_H; FG_W = Math.round(img.width * MAX_H / img.height); }
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  // רקע: התמונה בכיסוי מלא + טשטוש והכהיה
+  const scale = Math.max(W/img.width, H/img.height) * 1.06;
+  const bw = img.width * scale, bh = img.height * scale;
+  const canFilter = typeof ctx.filter === 'string';
+  ctx.save();
+  if(canFilter) ctx.filter = 'blur(55px) brightness(0.82) saturate(1.1)';
+  ctx.drawImage(img, (W-bw)/2, (H-bh)/2, bw, bh);
+  ctx.restore();
+  if(!canFilter){ // גיבוי לדפדפנים ללא ctx.filter: כיסוי + הכהיה
+    ctx.fillStyle = 'rgba(10,20,28,0.45)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  // התמונה המלאה במרכז
+  const fgX = Math.round((W - FG_W)/2), fgY = Math.round((H - FG_H)/2);
+  // צל רך
+  ctx.save();
+  if(canFilter) ctx.filter = 'blur(22px)';
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  rr(ctx, fgX-4, fgY-2, FG_W+8, FG_H+12, R+8);
+  ctx.fill();
+  ctx.restore();
+  // התמונה עם פינות מעוגלות
+  ctx.save();
+  rr(ctx, fgX, fgY, FG_W, FG_H, R);
+  ctx.clip();
+  ctx.drawImage(img, fgX, fgY, FG_W, FG_H);
+  ctx.restore();
+  const blob = await new Promise((res,rej)=>canvas.toBlob(b=> b? res(b) : rej(new Error('compose failed')), 'image/jpeg', 0.92));
+  return { blob, fitted: true };
+}
+
 async function handleFileUpload(input){
   const file = input.files[0];
   if(!file) return;
@@ -783,8 +844,12 @@ async function handleFileUpload(input){
       return;
     }
     let uploadBlob = file;
+    let wasFitted = false;
     if(file.type.startsWith('image/')){
-      uploadBlob = await compressImgToBlob(file, 2400, 0.92);
+      status.textContent = 'מעבד תמונה...';
+      const fitted = await fitImageToLandscape(file);
+      uploadBlob = fitted.blob;
+      wasFitted = fitted.fitted;
     } else if(!file.type.startsWith('video/')){
       status.textContent = 'סוג קובץ לא נתמך';
       status.style.color = '#ef4444';
@@ -797,7 +862,7 @@ async function handleFileUpload(input){
     const j = await r.json();
     if(j.success && j.file_url){
       urlField.value = j.file_url;
-      status.textContent = (file.type.startsWith('image/')?'תמונה מוכנה ✓':'סרטון מוכן ✓');
+      status.textContent = wasFitted ? 'התמונה הותאמה אוטומטית למסך ✓' : (file.type.startsWith('image/')?'תמונה מוכנה ✓':'סרטון מוכן ✓');
       status.style.color = '#22c55e';
     } else {
       status.textContent = 'שגיאה בהעלאה: ' + (j.error||'לא ידוע');
