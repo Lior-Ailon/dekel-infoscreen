@@ -253,6 +253,7 @@ function renderPositiveNews(items){
   const html=filled.map(item=>'<div class="news-item"><span class="dot"></span><span>'+item.title+'</span></div>').join('');
   document.getElementById('newsTrack').innerHTML=html+html;
 }
+let _photoRotateTimer=null;
 function renderPhotos(items){
   if(!items||items.length===0)items=CONTENT.photos;
   if(!items||items.length===0)return;
@@ -290,12 +291,15 @@ function renderPhotos(items){
     });
   });
   // Smooth crossfade: remove old + add new simultaneously
-  setInterval(()=>{
+  if(_photoRotateTimer) clearInterval(_photoRotateTimer);
+  _photoRotateTimer=setInterval(()=>{
     curIdx=(curIdx+1)%items.length;
     allSlides.forEach(s=>s.classList.remove('on'));
     allDots.forEach(d=>d.classList.remove('active'));
     allSlides[curIdx].classList.add('on');
     allDots[curIdx].classList.add('active');
+    if(items[curIdx]&&items[curIdx].title) caption.textContent=items[curIdx].title;
+    else if(caption) caption.textContent='';
   },7000);
 }
 loadContent();

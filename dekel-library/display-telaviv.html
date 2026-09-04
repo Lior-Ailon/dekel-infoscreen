@@ -232,12 +232,14 @@ function renderPositiveNews(items){
   const html=items.map(item=>'<div class="news-item"><span class="dot"></span><span>'+item.title+'</span></div>').join('');
   document.getElementById('newsTrack').innerHTML=html+html;
 }
+let _photoRotateTimer=null;
 function renderPhotos(items){
   if(!items||items.length===0)items=CONTENT.photos;
   if(!items||items.length===0)return;
   const panel=document.getElementById('photoPanel');
   const dots=document.getElementById('photoDots');
   const caption=document.getElementById('caption');
+  panel.querySelectorAll('.photo-slide').forEach(s=>s.remove());
   let slidesHtml='';
   let dotsHtml='';
   items.forEach((item,i)=>{
@@ -267,7 +269,8 @@ function renderPhotos(items){
       curIdx=idx;
     });
   });
-  setInterval(()=>{
+  if(_photoRotateTimer) clearInterval(_photoRotateTimer);
+  _photoRotateTimer=setInterval(()=>{
     curIdx=(curIdx+1)%items.length;
     allSlides.forEach(s=>s.classList.remove('on'));
     allDots.forEach(d=>d.classList.remove('active'));
