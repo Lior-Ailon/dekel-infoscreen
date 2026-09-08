@@ -33,6 +33,12 @@
 html{height:100%;width:100%}
 /* Lobby theme: modern emerald/slate — residential building style */
 :root{--purple:#059669;--purple-dark:#064e3b;--orange:#334155;--orange-dark:#1e293b;--green:#10b981;--green-dark:#047857}
+/* Weather widget — live weather, lobby style */
+.rect-weather{flex-shrink:0;width:clamp(150px,16vw,380px);background:linear-gradient(160deg,#ecfdf5,#d1fae5);border:2px solid rgba(5,150,105,.30);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;gap:clamp(6px,.9vw,16px);padding:clamp(6px,1vw,16px)}
+.w-icon{font-size:var(--fs-icon);line-height:1}
+.w-data{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.w-temp{font-size:clamp(1.1rem,2.8vw,5rem);font-weight:800;color:#064e3b;line-height:1.05}
+.w-city{font-size:var(--fs-clock-date);font-weight:700;color:#047857}
 body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,sans-serif;background:#fff;color:#1e293b;overflow:hidden}
 #frame{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
 .wrap{width:100%;flex:1;display:flex;flex-direction:column;gap:var(--gap);padding:var(--pad) var(--pad);padding-bottom:calc(var(--bar-h) + var(--pad));min-height:0;overflow:hidden}
@@ -165,7 +171,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 <div class="wrap">
   <div class="header">
     <div class="header-right"><div class="rect rect-clock"><div class="clock-num" id="clock">--:--</div><div class="clock-date" id="dateStr">--</div></div></div>
-    <div class="header-center"><div class="rect rect-library"><div class="lib-icon">🏢</div><div class="txt"><h2>לובי הבניין</h2><p>הבית שלנו — קהילה, ועד ושכנים טובים</p></div></div></div>
+    <div class="header-center"><div class="rect rect-library"><div class="lib-icon">🏢</div><div class="txt"><h2>לובי הבניין</h2><p>הבית שלנו — קהילה, ועד ושכנים טובים</p></div></div><div class="rect rect-weather"><div class="w-icon" id="wIcon">🌤️</div><div class="w-data"><div class="w-temp" id="wTemp">--°</div><div class="w-city">אשקלון</div></div></div></div>
     <div class="header-left"><div class="rect rect-infoscreen" onclick="clearCache()" style="cursor:pointer" title="ניקוי מטמון"><img src="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png" alt="InfoScreen" style="width:clamp(28px,4.5vw,72px);height:clamp(28px,4.5vw,72px);border-radius:clamp(6px,1vw,14px);object-fit:cover;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)"><div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="is-text">Info Screen</div><div class="is-sub">ניהול מסכים דיגיטליים</div></div></div></div>
   </div>
   <div class="body-grid">
@@ -328,6 +334,42 @@ function clearCache(){
     location.href=u.toString();
   },800);
 }
+
+// ===== מזג אוויר חי — אשקלון (Open-Meteo, ללא מפתח) =====
+const WMO={0:['☀️','בהיר'],1:['🌤️','בהיר חלקית'],2:['⛅','מעונן חלקית'],3:['☁️','מעונן'],45:['🌫️','ערפל'],48:['🌫️','ערפל'],51:['🌦️','טפטוף'],53:['🌦️','טפטוף'],55:['🌦️','טפטוף'],61:['🌧️','גשם קל'],63:['🌧️','גשם'],65:['🌧️','גשם חזק'],71:['🌨️','שלג קל'],73:['🌨️','שלג'],75:['❄️','שלג כבד'],80:['🌦️','ממטרות קלות'],81:['🌧️','ממטרות'],82:['⛈️','ממטרות חזקות'],95:['⛈️','סופות רעמים'],96:['⛈️','ברד ורעמים'],99:['⛈️','ברד ורעמים']};
+async function loadWeather(){
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=31.6693&longitude=34.5714&current=temperature_2m,weather_code&timezone=Asia%2FJerusalem');
+    const d=await r.json();const c=d.current;if(!c)return;
+    const info=WMO[c.weather_code]||['🌤️',''];
+    document.getElementById('wIcon').textContent=info[0];
+    document.getElementById('wTemp').textContent=Math.round(c.temperature_2m)+'°';
+  }catch(e){}
+}
+loadWeather();setInterval(loadWeather,30*60*1000);
+// ===== חדשות Ynet חיות (RSS) — טיקר =====
+async function loadYnetNews(){
+  const urls=[
+    'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://news.google.com/rss/search?q=site:ynet.co.il&hl=il&gl=IL&ceid=IL:he'),
+    'https://base44.app/api/apps/69f63b4536d7a2c6688403df/functions/getYnetNews'
+  ];
+  for(const u of urls){
+    try{
+      const r=await fetch(u);const d=await r.json();
+      let hs=(d&&d.items)?d.items.map(i=>i.title):((d&&d.headlines)||[]);
+      hs=hs.filter(t=>t&&t.length>5).map(t=>t.replace(/ - ynet\.co\.il$/,'')).slice(0,12);
+      if(hs.length>=3){
+        renderPositiveNews(hs.map(t=>({title:t})));
+        const lbl=document.querySelector('.news-label span:nth-child(2)');
+        if(lbl)lbl.textContent='חדשות Ynet';
+        const emo=document.querySelector('.news-label span:first-child');
+        if(emo)emo.textContent='📰';
+        return;
+      }
+    }catch(e){}
+  }
+}
+loadYnetNews();setInterval(loadYnetNews,15*60*1000);
 </script>
 </body>
 </html>
