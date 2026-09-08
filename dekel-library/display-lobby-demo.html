@@ -250,7 +250,8 @@ function renderLibrary(items){
   // Duplicate for seamless infinite scroll (animate to -50%)
   document.getElementById('newsScroll').innerHTML=html+html;
 }
-function renderPositiveNews(items){
+function renderPositiveNews(items,force){
+  if(window._ynetLoaded&&!force)return;
   if(!items||items.length===0)items=CONTENT.positive_news;
   let filled=items.slice();
   while(filled.length<20) filled=filled.concat(items);
@@ -359,7 +360,8 @@ async function loadYnetNews(){
       let hs=(d&&d.items)?d.items.map(i=>i.title):((d&&d.headlines)||[]);
       hs=hs.filter(t=>t&&t.length>5).map(t=>t.replace(/ - ynet\.co\.il$/,'')).slice(0,12);
       if(hs.length>=3){
-        renderPositiveNews(hs.map(t=>({title:t})));
+        window._ynetLoaded=true;
+        renderPositiveNews(hs.map(t=>({title:t})),true);
         const lbl=document.querySelector('.news-label span:nth-child(2)');
         if(lbl)lbl.textContent='חדשות Ynet';
         const emo=document.querySelector('.news-label span:first-child');
