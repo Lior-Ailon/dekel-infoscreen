@@ -109,7 +109,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 .news-ticker{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;direction:ltr}
 .news-track{display:flex;gap:clamp(20px,2.5vw,40px);white-space:nowrap;direction:ltr;animation:tickerLTR 80s linear infinite}
 .news-track:hover{animation-play-state:paused}
-@keyframes tickerLTR{from{transform:translateX(0%)}to{transform:translateX(-50%)}}
+@keyframes tickerLTR{from{transform:translateX(-50%)}to{transform:translateX(0%)}}
 .news-item{display:inline-flex;align-items:center;gap:8px;color:#fff;font-size:var(--fs-ticker);font-weight:500;direction:rtl}
 .news-item .dot{width:6px;height:6px;border-radius:50%;background:#fff;opacity:.7;flex-shrink:0}
 /* Tablet portrait (768px) */
