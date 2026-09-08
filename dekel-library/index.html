@@ -532,6 +532,44 @@ function go(page){
 function pgHub(){
   const lib = S.library || {};
   const url = getDisplayUrl(lib.id);
+  const isDemo = lib.id==='demo' || (S.user&&S.user.username==='demo');
+  const demoScreens = [
+    {t:'Info Screen — דמו כללי', d:'מסך תצוגה כללי - מתאים לכל סוג לקוח', f:'display-info-demo.html', ic:'ph ph-monitor-play'},
+    {t:'לובי בניין מגורים', d:'מסך לובי - חדשות חיות, אירועים והודעות ועד הבית', f:'display-lobby-demo.html', ic:'ph ph-buildings'},
+    {t:'בית אבות', d:'מסך בית אבות - אווירה חמה, פעילויות ותפריט היום', f:'display-nursing-demo.html', ic:'ph ph-house-line'}
+  ];
+  if(isDemo){
+    const base=location.origin + location.pathname.replace(/index\.html$/,'');
+    $('main').innerHTML = consoleBanner()+`
+      <div class="portal">
+        <div class="portal-head">
+          <div class="kick">סביבת הדמו</div>
+          <h1>Info Screen — מסכי דמו</h1>
+          <p>שלום ${esc(S.user.display_name||S.user.username)} - שלושת מסכי הדמו של המערכת</p>
+        </div>
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-h"><h3><i class="ph ph-monitor-play"></i> מסכי תצוגה</h3>
+            <button class="btn-add" onclick="go('manage')">ניהול התוכן ←</button></div>
+          ${demoScreens.map(s=>{const u=base+s.f;return `
+          <div style="padding:14px 6px;border-bottom:1px solid var(--line,#e7e2da)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <i class="${s.ic}" style="font-size:1.5rem"></i>
+              <b>${s.t}</b> <span style="color:var(--ink-soft);font-size:.85rem">${s.d}</span>
+            </div>
+            ${linkBox(u)}
+          </div>`}).join('')}
+        </div>
+        <div class="two">
+          <div class="big-card mg" onclick="go('manage')">
+            <div class="ic"><i class="ph ph-gear"></i></div>
+            <h2>ניהול תוכן</h2>
+            <p>אירועים, הודעות, תמונות ופרטי קשר של מסך הדמו הכללי - הכל במקום אחד.</p>
+            <span class="go">כניסה לניהול ←</span>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
   $('main').innerHTML = consoleBanner()+`
     <div class="portal">
       <div class="portal-head">
