@@ -73,7 +73,7 @@ body{height:100%;font-family:'Heebo',system-ui,sans-serif;background:linear-grad
 .news-body::before,.news-body::after{content:"";position:absolute;left:0;right:0;height:clamp(16px,1.5vw,28px);z-index:2;pointer-events:none}
 .news-body::before{top:0;background:linear-gradient(180deg,#fafbff,transparent)}
 .news-body::after{bottom:0;background:linear-gradient(0deg,#eef2f9,transparent)}
-.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 50s linear infinite}
+.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 62.5s linear infinite}
 .news-scroll:hover{animation-play-state:paused}
 @keyframes scrollUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .news-card{background:#fff;border-radius:var(--card-radius);padding:clamp(8px,1vw,16px) clamp(10px,1.2vw,18px);display:flex;gap:clamp(6px,.8vw,12px);align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.05)}
