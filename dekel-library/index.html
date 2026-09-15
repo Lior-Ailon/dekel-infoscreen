@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="2.4-simplify-admin">
+<meta name="version" content="2.5-two-tabs">
 <title>Info Screen · ניהול מסכים דיגיטליים</title>
 <link rel="icon" href="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -615,7 +615,7 @@ function currentLibId(){ const l=currentLib(); return l.id||null; }
 function pgManage(){
   const lib=currentLib();
   const isDemoUser = S.user && S.user.username==='demo';
-  const allTabs=[['newlib','<i class="ph ph-sparkle"></i> חדש בספרייה'],['news','<i class="ph ph-newspaper"></i> חדשות טובות'],['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים']];
+  const allTabs=[['newlib','<i class="ph ph-sparkle"></i> חדש בספרייה'],['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים']];
   const tabs = isDemoUser ? allTabs.filter(t=>t[0]==='newlib'||t[0]==='photos') : allTabs;
   if(isDemoUser && !tabs.find(t=>t[0]===S.tab)) S.tab='newlib';
   $('main').innerHTML = `
