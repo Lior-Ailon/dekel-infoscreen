@@ -77,7 +77,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 .news-body::before,.news-body::after{content:"";position:absolute;left:0;right:0;height:clamp(16px,1.5vw,28px);z-index:2;pointer-events:none}
 .news-body::before{top:0;background:linear-gradient(180deg,#fff,transparent)}
 .news-body::after{bottom:0;background:linear-gradient(0deg,#f8fafc,transparent)}
-.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 150s linear infinite}
+.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 180s linear infinite}
 .news-scroll:hover{animation-play-state:paused}
 @keyframes scrollUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .news-card{background:#fff;border-radius:var(--card-radius);padding:clamp(8px,1vw,16px) clamp(10px,1.2vw,18px);display:flex;gap:clamp(6px,.8vw,12px);align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -101,7 +101,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 .news-bar{position:fixed;bottom:0;left:0;right:0;height:var(--bar-h);display:flex;align-items:center;gap:clamp(8px,1vw,16px);border-radius:0;background:linear-gradient(135deg,var(--green),var(--green-dark));box-shadow:0 4px 14px rgba(0,0,0,.10);padding:0 clamp(10px,1.3vw,24px);overflow:hidden;z-index:10}
 .news-label{display:flex;align-items:center;gap:6px;flex-shrink:0;color:#fff;font-weight:800;font-size:var(--fs-ticker-label);border-left:2px solid rgba(255,255,255,.3);padding-left:clamp(8px,1vw,14px)}
 .news-ticker{flex:1;overflow:hidden;height:100%;display:flex;align-items:center;direction:ltr}
-.news-track{display:flex;gap:clamp(20px,2.5vw,40px);white-space:nowrap;direction:ltr;animation:tickerLTR 96s linear infinite}
+.news-track{display:flex;gap:clamp(20px,2.5vw,40px);white-space:nowrap;direction:ltr;animation:tickerLTR 115s linear infinite}
 .news-track:hover{animation-play-state:paused}
 @keyframes tickerLTR{from{transform:translateX(0%)}to{transform:translateX(-50%)}}
 .news-item{display:inline-flex;align-items:center;gap:8px;color:#fff;font-size:var(--fs-ticker);font-weight:500;direction:rtl}
