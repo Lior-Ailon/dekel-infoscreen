@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="version" content="2.3-real-upload">
+<meta name="version" content="2.4-simplify-admin">
 <title>Info Screen · ניהול מסכים דיגיטליים</title>
 <link rel="icon" href="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -350,7 +350,7 @@ function getDisplayUrl(libId){
   return DISPLAY_URL + (libId?`?library_id=${libId}`:'');
 }
 
-const S = { user:null, library:null, token:null, page:'hub', ctxLib:null, tab:'events' };
+const S = { user:null, library:null, token:null, page:'hub', ctxLib:null, tab:'newlib' };
 // Strip formatting on paste in rich text editors - keep only plain text
 document.addEventListener('paste',function(e){
   const ed=e.target;
@@ -615,7 +615,7 @@ function currentLibId(){ const l=currentLib(); return l.id||null; }
 function pgManage(){
   const lib=currentLib();
   const isDemoUser = S.user && S.user.username==='demo';
-  const allTabs=[['newlib','<i class="ph ph-sparkle"></i> חדש בספרייה'],['news','<i class="ph ph-newspaper"></i> חדשות טובות'],['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים'],['events','<i class="ph ph-calendar-blank"></i> אירועים'],['msg','<i class="ph ph-megaphone"></i> הודעות'],['settings','<i class="ph ph-gear"></i> שעות ופרטי קשר']];
+  const allTabs=[['newlib','<i class="ph ph-sparkle"></i> חדש בספרייה'],['news','<i class="ph ph-newspaper"></i> חדשות טובות'],['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים']];
   const tabs = isDemoUser ? allTabs.filter(t=>t[0]==='newlib'||t[0]==='photos') : allTabs;
   if(isDemoUser && !tabs.find(t=>t[0]===S.tab)) S.tab='newlib';
   $('main').innerHTML = `
@@ -1166,8 +1166,8 @@ async function delRow(entity,id,msg){
    אדמין - סקירה
    ========================================================= */
 async function pgDash(){
-  const [libRes,usrRes,evRes] = await Promise.all([api('library','list'),api('user','list'),api('event','list')]);
-  const libs=libRes.success?libRes.data:[], usrs=usrRes.success?usrRes.data:[], evs=evRes.success?evRes.data:[];
+  const [libRes,usrRes] = await Promise.all([api('library','list'),api('user','list')]);
+  const libs=libRes.success?libRes.data:[], usrs=usrRes.success?usrRes.data:[];
   const active = libs.filter(l=>l.status==='active').length;
   $('main').innerHTML=consoleBanner()+`
     <h2 class="ptitle">שלום ${esc(S.user.display_name||'')}</h2>
@@ -1176,7 +1176,6 @@ async function pgDash(){
       ${stat('<i class="ph ph-bank"></i>','#e3ece6',libs.length,'ספריות ולקוחות')}
       ${stat('<i class="ph ph-check-circle"></i>','#dfeadf',active,'פעילים')}
       ${stat('<i class="ph ph-users-three"></i>','#eef0e8',usrs.length,'משתמשים')}
-      ${stat('<i class="ph ph-calendar-blank"></i>','#f6ecd8',evs.filter(e=>e.status==='upcoming').length,'אירועים קרובים')}
     </div>
     <div class="card">
       <div class="card-h"><h3>הלקוחות שלי</h3><button class="btn-add" onclick="formLib()">+ לקוח חדש</button></div>
@@ -1193,7 +1192,7 @@ function stat(i,bg,v,l){ return `<div class="stat"><div class="i" style="backgro
 async function enterLib(id){
   const r = await api('library','list');
   if(r.success){ S.ctxLib = r.data.find(l=>l.id===id)||null; _libCache=null; }
-  S.tab='events'; go('manage');
+  S.tab='newlib'; go('manage');
 }
 
 /* =========================================================
