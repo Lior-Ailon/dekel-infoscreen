@@ -83,7 +83,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 .news-body::before,.news-body::after{content:"";position:absolute;left:0;right:0;height:clamp(16px,1.5vw,28px);z-index:2;pointer-events:none}
 .news-body::before{top:0;background:linear-gradient(180deg,#fff,transparent)}
 .news-body::after{bottom:0;background:linear-gradient(0deg,#f8fafc,transparent)}
-.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 62.5s linear infinite}
+.news-scroll{display:flex;flex-direction:column;gap:clamp(6px,.7vw,12px);animation:scrollUp 125s linear infinite}
 .news-scroll:hover{animation-play-state:paused}
 @keyframes scrollUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .news-card{background:#fff;border-radius:var(--card-radius);padding:clamp(8px,1vw,16px) clamp(10px,1.2vw,18px);display:flex;gap:clamp(6px,.8vw,12px);align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -171,7 +171,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
 <div class="wrap">
   <div class="header">
     <div class="header-right"><div class="rect rect-clock"><div class="clock-num" id="clock">--:--</div><div class="clock-date" id="dateStr">--</div></div></div>
-    <div class="header-center"><div class="rect rect-library"><div class="lib-icon">🏢</div><div class="txt"><h2>לובי הבניין</h2><p>הבית שלנו — קהילה, ועד ושכנים טובים</p></div></div><div class="rect rect-weather"><div class="w-icon" id="wIcon">🌤️</div><div class="w-data"><div class="w-temp" id="wTemp">--°</div><div class="w-city">אשקלון</div></div></div></div>
+    <div class="header-center"><div class="rect rect-library"><div class="txt"><h2>לובי הבניין</h2><p>הבית שלנו — קהילה, ועד ושכנים טובים</p></div></div><div class="rect rect-weather"><div class="w-icon" id="wIcon">🌤️</div><div class="w-data"><div class="w-temp" id="wTemp">--°</div><div class="w-city">אשקלון</div></div></div></div>
     <div class="header-left"><div class="rect rect-infoscreen" onclick="clearCache()" style="cursor:pointer" title="ניקוי מטמון"><img src="https://media.base44.com/images/public/69f63b4536d7a2c6688403df/a8e957c4e_generated_image.png" alt="InfoScreen" style="width:clamp(18px,2.6vw,40px);height:clamp(18px,2.6vw,40px);border-radius:clamp(4px,.7vw,10px);object-fit:cover;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)"><div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="is-text">Info Screen</div><div class="is-sub">ניהול מסכים דיגיטליים</div></div></div></div>
   </div>
   <div class="body-grid">
@@ -181,7 +181,7 @@ body{height:100%;width:100%;margin:0;padding:0;font-family:'Heebo',system-ui,san
     </div>
     <div class="news-panel">
       <div class="news-head"><h2>הודעות הוועד</h2></div>
-      <div class="news-body"><div class="news-scroll" id="newsScroll"><div class="news-card"><div class="badge b-blue">📚</div><div><div class="src">טוען עדכונים...</div></div></div></div></div></div>
+      <div class="news-body"><div class="news-scroll" id="newsScroll"><div class="news-card"><div class="badge b-blue"></div><div><div class="src">טוען עדכונים...</div></div></div></div></div></div>
     </div>
   </div>
 </div>
@@ -241,7 +241,7 @@ function renderLibrary(items){
     const badge='b-'+(item.badge_color||'blue');
     const dateHtml=item.event_date?'<div class="event-date">📅 '+item.event_date+'</div>':'';
     const descHtml=item.description?'<div class="txt">'+item.title+'</div><div style="font-size:var(--fs-news-desc);color:#64748b;margin-top:2px;line-height:1.4">'+item.description+'</div>'+dateHtml:'<div class="txt">'+item.title+'</div>'+dateHtml;
-    return '<div class="news-card"><div class="badge '+badge+'">'+(item.icon||'📚')+'</div><div>'+descHtml+'</div></div>';
+    return '<div class="news-card"><div class="badge '+badge+'"></div><div>'+descHtml+'</div></div>';
   }
   // If few items, repeat them to fill at least ~12 slots before duplicating
   let filled = items.slice();
@@ -275,7 +275,7 @@ function renderPhotos(items){
     if(img){
       slidesHtml+='<div class="photo-slide'+(i===0?' on':'')+'"><img src="'+img+'" alt="'+title+'"></div>';
     }else{
-      slidesHtml+='<div class="photo-slide'+(i===0?' on':'')+'"><div class="photo-ph"><div class="ic">🖼️</div><div class="t">'+title+'</div></div></div>';
+      slidesHtml+='<div class="photo-slide'+(i===0?' on':'')+'"><div class="photo-ph"><div class="t">'+title+'</div></div></div>';
     }
     dotsHtml+='<div class="photo-dot'+(i===0?' active':'')+'" data-idx="'+i+'"></div>';
   });
