@@ -640,7 +640,7 @@ async function tabNewLib(){
     <div class="card">
       <div class="card-h"><h3>חדש בספרייה</h3><button class="btn-add" onclick="formSection('new_in_library')">+ פריט חדש</button></div>
       <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">מופיע בצד שמאל של מסך התצוגה</p>
-      ${rows.length? `<table><thead><tr><th>כותרת</th><th>תיאור</th><th>תאריך</th><th>הצגה</th><th></th></tr></thead><tbody>
+      ${rows.length? `<table><thead><tr><th>כותרת</th><th>תיאור</th><th>תאריך</th><th></th></tr></thead><tbody>
         ${rows.map(r=>sectionRow(r)).join('')}</tbody></table>`
       : `<div class="empty"><span class="i"><i class="ph ph-sparkle"></i></span>אין פריטים. הוסיפו את הראשון.</div>`}
     </div>`;
@@ -653,7 +653,7 @@ async function tabNews(){
     <div class="card">
       <div class="card-h"><h3>חדשות טובות</h3><button class="btn-add" onclick="formSection('positive_news')">+ פריט חדש</button></div>
       <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">מופיע בפס התחתון של מסך התצוגה</p>
-      ${rows.length? `<table><thead><tr><th>כותרת</th><th>הצגה</th><th></th></tr></thead><tbody>
+      ${rows.length? `<table><thead><tr><th>כותרת</th><th></th></tr></thead><tbody>
         ${rows.map(r=>sectionRow(r)).join('')}</tbody></table>`
       : `<div class="empty"><span class="i"><i class="ph ph-newspaper"></i></span>אין חדשות טובות. הוסיפו את הראשונה.</div>`}
     </div>`;
@@ -676,11 +676,11 @@ async function tabPhotos(){
           return `<div style="background:#fff;border:1px solid var(--paper-edge);border-radius:10px;padding:10px;${shown?'':'opacity:.5'}">
             ${thumb}
             <div style="font-weight:700;margin-top:8px;font-size:.9rem">${esc(r.title||'')}</div>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;margin-top:6px" title="סימון = מוצג במסך הטלוויזיה">
-              <input type="checkbox" ${shown?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:18px;height:18px;accent-color:#0d9488;cursor:pointer"> מוצג</label>
-            <div style="display:flex;gap:6px;margin-top:6px">
+            <div style="display:flex;gap:6px;margin-top:6px;align-items:center">
               <button class="ba ed" onclick="formPhoto('${r.id}')">ערוך</button>
               <button class="ba del" onclick="delSection('${r.id}','למחוק?')">מחק</button>
+              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:700;font-size:.85rem;margin-right:auto" title="סימון = מוצג במסך הטלוויזיה">
+                <input type="checkbox" ${shown?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:20px;height:20px;accent-color:#0d9488;cursor:pointer"> הצג</label>
             </div>
           </div>`;
         }).join('')}
@@ -700,11 +700,11 @@ function sectionRow(r){
     <td><b>${esc(r.title||'')}</b></td>
     <td>${esc((r.description||'').slice(0,60))}</td>
     <td>${esc(r.event_date||'-')}</td>
-    <td><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;${r.status==='hidden'?'opacity:.45':''}" title="סימון = מוצג במסך הטלוויזיה">
-      <input type="checkbox" ${r.status==='active'?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:18px;height:18px;accent-color:#0d9488;cursor:pointer"> מוצג</label></td>
     <td style="white-space:nowrap">
       <button class="ba ed" onclick="formSection('${r.section}','${r.id}')">ערוך</button>
-      <button class="ba del" onclick="delSection('${r.id}','למחוק?')">מחק</button></td>
+      <button class="ba del" onclick="delSection('${r.id}','למחוק?')">מחק</button>
+      <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-weight:700;margin-right:10px;${r.status==='hidden'?'opacity:.45':''}" title="סימון = מוצג במסך הטלוויזיה">
+        <input type="checkbox" ${r.status==='active'?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:20px;height:20px;accent-color:#0d9488;cursor:pointer"> הצג</label></td>
   </tr>`;
 }
 
