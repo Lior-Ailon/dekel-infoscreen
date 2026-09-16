@@ -640,7 +640,7 @@ async function tabNewLib(){
     <div class="card">
       <div class="card-h"><h3>חדש בספרייה</h3><button class="btn-add" onclick="formSection('new_in_library')">+ פריט חדש</button></div>
       <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">מופיע בצד שמאל של מסך התצוגה</p>
-      ${rows.length? `<table><thead><tr><th>כותרת</th><th>תיאור</th><th>תאריך</th><th>סטטוס</th><th></th></tr></thead><tbody>
+      ${rows.length? `<table><thead><tr><th>כותרת</th><th>תיאור</th><th>תאריך</th><th>הצגה</th><th></th></tr></thead><tbody>
         ${rows.map(r=>sectionRow(r)).join('')}</tbody></table>`
       : `<div class="empty"><span class="i"><i class="ph ph-sparkle"></i></span>אין פריטים. הוסיפו את הראשון.</div>`}
     </div>`;
@@ -653,7 +653,7 @@ async function tabNews(){
     <div class="card">
       <div class="card-h"><h3>חדשות טובות</h3><button class="btn-add" onclick="formSection('positive_news')">+ פריט חדש</button></div>
       <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">מופיע בפס התחתון של מסך התצוגה</p>
-      ${rows.length? `<table><thead><tr><th>כותרת</th><th>סטטוס</th><th></th></tr></thead><tbody>
+      ${rows.length? `<table><thead><tr><th>כותרת</th><th>הצגה</th><th></th></tr></thead><tbody>
         ${rows.map(r=>sectionRow(r)).join('')}</tbody></table>`
       : `<div class="empty"><span class="i"><i class="ph ph-newspaper"></i></span>אין חדשות טובות. הוסיפו את הראשונה.</div>`}
     </div>`;
@@ -672,9 +672,12 @@ async function tabPhotos(){
           const thumb = isVideo 
             ? '<div style="width:100%;height:120px;background:#1e293b;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff">🎬</div>'
             : (r.image_url ? `<img src="${esc(r.image_url)}" style="width:100%;height:120px;object-fit:cover;border-radius:8px">` : '<div style="width:100%;height:120px;background:#e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem">🖼️</div>');
-          return `<div style="background:#fff;border:1px solid var(--paper-edge);border-radius:10px;padding:10px">
+          const shown = (r.status||'active')==='active';
+          return `<div style="background:#fff;border:1px solid var(--paper-edge);border-radius:10px;padding:10px;${shown?'':'opacity:.5'}">
             ${thumb}
             <div style="font-weight:700;margin-top:8px;font-size:.9rem">${esc(r.title||'')}</div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;margin-top:6px" title="סימון = מוצג במסך הטלוויזיה">
+              <input type="checkbox" ${shown?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:18px;height:18px;accent-color:#0d9488;cursor:pointer"> מוצג</label>
             <div style="display:flex;gap:6px;margin-top:6px">
               <button class="ba ed" onclick="formPhoto('${r.id}')">ערוך</button>
               <button class="ba del" onclick="delSection('${r.id}','למחוק?')">מחק</button>
@@ -697,7 +700,8 @@ function sectionRow(r){
     <td><b>${esc(r.title||'')}</b></td>
     <td>${esc((r.description||'').slice(0,60))}</td>
     <td>${esc(r.event_date||'-')}</td>
-    <td><span class="pill ${r.status==='active'?'ok':'off'}">${r.status==='active'?'פעיל':'מוסתר'}</span></td>
+    <td><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;${r.status==='hidden'?'opacity:.45':''}" title="סימון = מוצג במסך הטלוויזיה">
+      <input type="checkbox" ${r.status==='active'?'checked':''} onchange="toggleShown('${r.id}', this.checked)" style="width:18px;height:18px;accent-color:#0d9488;cursor:pointer"> מוצג</label></td>
     <td style="white-space:nowrap">
       <button class="ba ed" onclick="formSection('${r.section}','${r.id}')">ערוך</button>
       <button class="ba del" onclick="delSection('${r.id}','למחוק?')">מחק</button></td>
@@ -761,17 +765,18 @@ async function formSection(section,id){
         <option value="coral" ${r.badge_color==='coral'?'selected':''}>אלמוג</option>
       </select></div>
     </div>`:''}
-    <div class="fg"><label>סטטוס</label><select id="sc_status">
-      <option value="active" ${(r.status||'active')==='active'?'selected':''}>פעיל</option>
-      <option value="hidden" ${r.status==='hidden'?'selected':''}>מוסתר</option>
-    </select></div>
+    <div class="fg"><label>מוצג במסך</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700">
+        <input type="checkbox" id="sc_status" ${(r.status||'active')!=='hidden'?'checked':''} style="width:20px;height:20px;accent-color:#0d9488;cursor:pointer">
+        מוצג — הסרת הסימון תסתיר מהמסך
+      </label></div>
     <div class="facts"><button class="btn-save" onclick="saveSection('${section}','${id||''}')">שמור</button>
       <button class="btn-cancel" onclick="closeModal()">ביטול</button></div>`);
 }
 
 async function saveSection(section,id){
   const d={ library_id:currentLibId(), section:section, title:$('sc_title').value.trim(),
-    status:$('sc_status').value, sort_order:0 };
+    status:$('sc_status').checked?'active':'hidden', sort_order:0 };
   if(section!=='positive_news'){
     d.description=$('sc_desc')?$('sc_desc').innerHTML:'';
     d.event_date=$('sc_date')?$('sc_date').value.trim():'';
@@ -787,6 +792,13 @@ async function delSection(id,msg){
   if(!confirm(msg)) return;
   const r = await api('content','delete',{},id);
   if(r.success){ toast('נמחק'); renderTab(); } else toast(r.message||'שגיאה');
+}
+
+/* --- הצגה/הסתרה מיידית במסך הטלוויזיה --- */
+async function toggleShown(id, show){
+  const r = await api('content','update',{status: show?'active':'hidden'}, id);
+  if(r.success){ toast(show?'מוצג במסך הטלוויזיה ✓':'הוסתר — לא יופיע במסך'); renderTab(); }
+  else toast(r.message||'שגיאה');
 }
 
 /* ---------- טופס תמונה/סרטון ---------- */
@@ -806,10 +818,11 @@ async function formPhoto(id){
     <div class="fg"><label>או הזן קישור (URL) ידנית</label><input id="ph_url" value="${esc(r.image_url||'')}" dir="ltr" placeholder="https://… (תמונה: jpg/png, סרטון: mp4)"></div>
     <div class="fg"><label>תיאור (אופציונלי)</label><textarea id="ph_desc" placeholder="טקסט נוסף">${esc(r.description||'')}</textarea></div>
     <p style="color:var(--ink-soft);font-size:.85rem;margin-bottom:10px">תמונות: jpg, png, gif | סרטונים: mp4, webm, mov — המערכת מזהה אוטומטית</p>
-    <div class="fg"><label>סטטוס</label><select id="ph_status">
-      <option value="active" ${(r.status||'active')==='active'?'selected':''}>פעיל</option>
-      <option value="hidden" ${r.status==='hidden'?'selected':''}>מוסתר</option>
-    </select></div>
+    <div class="fg"><label>מוצג במסך</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700">
+        <input type="checkbox" id="ph_status" ${(r.status||'active')!=='hidden'?'checked':''} style="width:20px;height:20px;accent-color:#0d9488;cursor:pointer">
+        מוצג — הסרת הסימון תסתיר מהמסך
+      </label></div>
     <div class="facts"><button class="btn-save" onclick="savePhoto('${id||''}')">שמור</button>
       <button class="btn-cancel" onclick="closeModal()">ביטול</button></div>`);
 }
@@ -946,7 +959,7 @@ function compressImgToBlob(file, maxW, quality){
 async function savePhoto(id){
   const d={ library_id:currentLibId(), section:'photos',
     title:$('ph_title').value.trim(), image_url:$('ph_url').value.trim(),
-    description:$('ph_desc').value.trim(), status:$('ph_status').value, sort_order:0 };
+    description:$('ph_desc').value.trim(), status:$('ph_status').checked?'active':'hidden', sort_order:0 };
   if(!d.title) return toast('נא להזין כותרת');
   if(!d.image_url) return toast('נא להזין קישור לתמונה או סרטון');
   const r = id? await api('content','update',d,id) : await api('content','create',d,null,currentLibId());
