@@ -234,11 +234,12 @@ body{
 .foot .art{width:170px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;padding:0 10px}
 
 /* ===== TICKER ===== */
+/* ticker grown +20% (Lior 16.9.26) */
 .tick{background:linear-gradient(160deg,var(--green),var(--green-deep));color:#eef5f0;
-  border-radius:14px;height:46px;display:flex;align-items:center;overflow:hidden;flex-shrink:0;position:relative;z-index:1}
-.tick .ic{font-size:20px;color:var(--sage-2);margin:0 18px;flex-shrink:0}
+  border-radius:16px;height:56px;display:flex;align-items:center;overflow:hidden;flex-shrink:0;position:relative;z-index:1}
+.tick .ic{font-size:24px;color:var(--sage-2);margin:0 20px;flex-shrink:0}
 .tick .track{flex:1;overflow:hidden;white-space:nowrap}
-.tick .track span{display:inline-block;padding-right:100%;animation:mq 36s linear infinite;font-size:1rem;font-weight:500}
+.tick .track span{display:inline-block;padding-right:100%;animation:mq 36s linear infinite;font-size:1.2rem;font-weight:600}
 @keyframes mq{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 
 /* ===== LOADING ===== */
@@ -738,16 +739,31 @@ function clearCache(){
     const vh = window.innerHeight || document.documentElement.clientHeight;
     const isLandscape = vw > vh && vw > 1100;
     if (isLandscape) {
-      // TV/Desktop landscape: fixed 1920x1080 canvas scaled to fit
-      const scale = Math.min(vw / 1920, vh / 1080);
-      frame.style.transform = 'scale(' + scale + ')';
+      // TV/Desktop landscape: fixed 1920x1080 canvas scaled to fit.
+      // Overscan compensation: many TVs zoom ~3-6% and swallow the frame edges,
+      // so we render at a safe ratio (default 94%) and center perfectly.
+      // Tune per-TV with ?safe=0.96 (or ?safe=1 to disable).
+      let safe = 0.94;
+      try{
+        const p = parseFloat(new URLSearchParams(location.search).get('safe'));
+        if(p>0.5 && p<=1) safe = p;
+      }catch(e){}
+      const scale = Math.min(vw / 1920, vh / 1080) * safe;
       frame.style.width = '1920px';
       frame.style.height = '1080px';
+      frame.style.position = 'absolute';
+      frame.style.left = '50%';
+      frame.style.top = '50%';
+      frame.style.margin = '0';
+      frame.style.transform = 'translate(-50%,-50%) scale(' + scale + ')';
       frame.style.minHeight = '';
       document.body.style.overflow = 'hidden';
     } else {
       // Mobile/portrait or narrow screens: responsive flow, allow scrolling
       frame.style.transform = 'none';
+      frame.style.position = '';
+      frame.style.left = '';
+      frame.style.top = '';
       frame.style.width = '100%';
       frame.style.height = 'auto';
       frame.style.minHeight = '100%';
