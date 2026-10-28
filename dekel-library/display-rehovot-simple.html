@@ -214,9 +214,10 @@ const CONTENT={
 function updateClock(){const now=new Date();document.getElementById('clock').textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];document.getElementById('dateStr').textContent='יום '+days[now.getDay()]+' '+now.getDate()+' ב'+months[now.getMonth()]}
 updateClock();setInterval(updateClock,1000);
 const API_URL='https://base44.app/api/apps/69f63b4536d7a2c6688403df/functions/getLibraryContent';
+function mkTimeout(){try{var c=new AbortController();setTimeout(function(){c.abort()},5000);return c.signal}catch(e){return undefined}}
 async function loadContent(){
   try{
-    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({library_id:'6a7cc19fa127f9005c2b4f3f',_t:Date.now()}),signal:AbortSignal.timeout(5000)});
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({library_id:'6a7cc19fa127f9005c2b4f3f',_t:Date.now()}),signal:mkTimeout()});
     const result=await res.json();
     if(result.success&&result.data){
       const d=result.data;
@@ -241,12 +242,20 @@ function renderLibrary(items){
     const descHtml=item.description?'<div class="txt">'+item.title+'</div><div style="font-size:var(--fs-news-desc);color:#64748b;margin-top:2px;line-height:1.4">'+item.description+'</div>'+dateHtml:'<div class="txt">'+item.title+'</div>'+dateHtml;
     return '<div class="news-card"><div class="badge '+badge+'"></div><div>'+descHtml+'</div></div>';
   }
+  const scrollEl = document.getElementById('newsScroll');
+  // Few items: show them once, no scrolling (prevents a wall of identical cards)
+  if(items.length < 4){
+    scrollEl.style.animation='none';
+    scrollEl.innerHTML = items.map(buildCard).join('');
+    return;
+  }
+  scrollEl.style.animation='';
   // If few items, repeat them to fill at least ~12 slots before duplicating
   let filled = items.slice();
   while(filled.length < 12) filled = filled.concat(items);
   const html = filled.map(buildCard).join('');
   // Duplicate for seamless infinite scroll (animate to -50%)
-  document.getElementById('newsScroll').innerHTML=html+html;
+  scrollEl.innerHTML=html+html;
 }
 function renderPositiveNews(items){
   if(!items||items.length===0)items=CONTENT.positive_news;
