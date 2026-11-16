@@ -338,8 +338,11 @@ const API_BASE  = 'https://base44.app/api/apps/69f63b4536d7a2c6688403df/function
 const UPLOAD_URL = API_BASE + '/libraryFileUpload';
 const DISPLAY_URL = location.origin + location.pathname.replace(/index\.html$/,'') + 'display.html';
 const REHOVOT_LIB_ID = '6a7cc19fa127f9005c2b4f3f';
+const SENIOR_CLUB_ID = '6af495d9ad0232fa56b7d2c5';   /* מועדון אזרחים ותיקים נוה שרת */
+const SENIOR_MANAGER_PAGE = 'senior-manager.html';
 const DISPLAY_MAP={
   '6a7cc19fa127f9005c2b4f3f':'display-rehovot-simple.html',
+  '6af495d9ad0232fa56b7d2c5':'display-senior.html',
   '6a9fad21e323ef0463aa5de7':'display-info-demo.html',
   '6a9ef6a12d8c0b448739ba9b':'display-lobby-demo.html',
   '6a9ef6a12d8c0b448739ba9c':'display-nursing-demo.html'
@@ -582,7 +585,7 @@ function pgHub(){
           <p>המסך שרץ על הטלוויזיה בעסק. נפתח בחלון חדש - פשוט להעביר למסך מלא.</p>
           <span class="go">פתיחת המסך ←</span>
         </div>
-        <div class="big-card mg" onclick="go('manage')">
+        <div class="big-card mg" onclick="openManage()">
           <div class="ic"><i class="ph ph-gear"></i></div>
           <h2>ניהול תוכן</h2>
           <p>אירועים, הודעות, ספרים מומלצים, שעות פתיחה ופרטי קשר - הכל במקום אחד.</p>
@@ -596,6 +599,15 @@ function pgHub(){
           פתחו את הקישור על המחשב המחובר לטלוויזיה, לחצו F11 למסך מלא - והמסך יתעדכן לבד כל דקה.</p>
       </div>
     </div>`;
+}
+
+function isSeniorLib(lib){
+  const l = lib || currentLib() || {};
+  return l.id === SENIOR_CLUB_ID;
+}
+function openManage(){
+  if(isSeniorLib()){ location.href = SENIOR_MANAGER_PAGE + '?t=' + encodeURIComponent(S.token||''); return; }
+  go('manage');
 }
 
 function linkBox(url){
@@ -1203,6 +1215,7 @@ async function pgDash(){
 function stat(i,bg,v,l){ return `<div class="stat"><div class="i" style="background:${bg}">${i}</div><div class="v">${v}</div><div class="l">${l}</div></div>`; }
 
 async function enterLib(id){
+  if(id===SENIOR_CLUB_ID){ location.href = SENIOR_MANAGER_PAGE + '?t=' + encodeURIComponent(S.token||''); return; }
   const r = await api('library','list');
   if(r.success){ S.ctxLib = r.data.find(l=>l.id===id)||null; _libCache=null; }
   S.tab='newlib'; go('manage');
@@ -1226,7 +1239,7 @@ async function pgLibs(){
           <td>${usrs.filter(u=>u.library_id===l.id).length}</td>
           <td><span class="pill ${l.status==='active'?'ok':'off'}">${l.status==='active'?'פעיל':'לא פעיל'}</span></td>
           <td style="white-space:nowrap">
-            <button class="ba go" onclick="enterLib('${l.id}')">סביבה</button>
+            <button class="ba go" onclick="enterLib('${l.id}')">${l.id===SENIOR_CLUB_ID?'ניהול תוכן':'סביבה'}</button>
             <button class="ba" style="background:#eef" onclick="window.open(getDisplayUrl('${l.id}'),'_blank')">מסך ↗</button>
             <button class="ba ed" onclick="formLib('${l.id}')">ערוך</button>
             <button class="ba del" onclick="delLib('${l.id}')">מחק</button></td>
