@@ -606,8 +606,8 @@ function isSeniorLib(lib){
   return l.id === SENIOR_CLUB_ID;
 }
 function openManage(){
-  if(isSeniorLib()){ location.href = SENIOR_MANAGER_PAGE + '?t=' + encodeURIComponent(S.token||''); return; }
-  go('manage');
+  /* ממשק ניהול אחד לכל הלקוחות — אין יותר מסכי ניהול נפרדים */
+  S.ctxLib = null; S.tab='newlib'; go('manage');
 }
 
 function linkBox(url){
@@ -627,8 +627,14 @@ function currentLibId(){ const l=currentLib(); return l.id||null; }
 function pgManage(){
   const lib=currentLib();
   const isDemoUser = S.user && S.user.username==='demo';
-  const allTabs=[['newlib','<i class="ph ph-sparkle"></i> חדש בספרייה'],['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים']];
-  const tabs = isDemoUser ? allTabs.filter(t=>t[0]==='newlib'||t[0]==='photos') : allTabs;
+  const allTabs=[
+    ['newlib','<i class="ph ph-megaphone"></i> הודעות וברכות'],
+    ['photos','<i class="ph ph-images-square"></i> תמונות וסרטונים'],
+    ['news','<i class="ph ph-newspaper"></i> טיקר תחתון'],
+    ['schedule','<i class="ph ph-calendar-dots"></i> לוח שבועי'],
+    ['settings','<i class="ph ph-sliders-horizontal"></i> פרטי המסך']
+  ];
+  const tabs = allTabs;
   if(isDemoUser && !tabs.find(t=>t[0]===S.tab)) S.tab='newlib';
   $('main').innerHTML = `
     <button class="back" onclick="go('${isAdmin()?'libs':'hub'}')">→ חזרה</button>
@@ -641,7 +647,7 @@ function pgManage(){
 function setTab(t){ S.tab=t; pgManage(); }
 
 function renderTab(){
-  ({newlib:tabNewLib, news:tabNews, photos:tabPhotos, events:tabEvents, books:tabBooks, msg:tabMsg, settings:tabSettings}[S.tab]||tabNewLib)();
+  ({newlib:tabNewLib, news:tabNews, photos:tabPhotos, schedule:tabSchedule, events:tabEvents, books:tabBooks, msg:tabMsg, settings:tabSettings}[S.tab]||tabNewLib)();
 }
 
 
@@ -1121,6 +1127,85 @@ async function saveMsg(){
 }
 
 /* ---------- שעות ופרטי קשר ---------- */
+/* =========================================================
+   לוח שבועי — עריכת הפעילויות שמופיעות במסך התצוגה
+   נשמר ב-LibraryTenant.display_settings.schedule
+   ========================================================= */
+const SCHED_DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const DEFAULT_SCHEDULE=[
+  {day:'ראשון',acts:[{t:'09:00',n:'התעמלות בוקר',d:'אולם הפעילות · מדריך מוסמך'},{t:'10:30',n:'קפה ועיתון',d:'כיבוד קל ושיחה'},{t:'12:30',n:'ארוחת צהריים',d:'תכנית מופ״ת'}]},
+  {day:'שני',acts:[{t:'09:00',n:'התעמלות בוקר',d:'אולם הפעילות'},{t:'10:30',n:'קפה ועיתון',d:'כיבוד קל ושיחה'},{t:'11:30',n:'פינת בריאות',d:'מדידת לחץ דם וסוכר'},{t:'12:30',n:'ארוחת צהריים',d:'תכנית מופ״ת'}]},
+  {day:'שלישי',acts:[{t:'09:00',n:'התעמלות בוקר',d:'אולם הפעילות'},{t:'10:00',n:'מעגל דיגיטלי',d:'טלפון חכם צעד אחר צעד'},{t:'10:30',n:'קפה ועיתון',d:'כיבוד קל ושיחה'},{t:'12:30',n:'ארוחת צהריים',d:'תכנית מופ״ת'}]},
+  {day:'רביעי',acts:[{t:'09:00',n:'התעמלות בוקר',d:'אולם הפעילות'},{t:'10:30',n:'קפה ועיתון',d:'כיבוד קל ושיחה'},{t:'11:00',n:'שירה בציבור',d:'עם ליווי אקורדיון'},{t:'12:30',n:'ארוחת צהריים',d:'תכנית מופ״ת'}]},
+  {day:'חמישי',acts:[{t:'09:00',n:'התעמלות בוקר',d:'אולם הפעילות'},{t:'10:30',n:'מועדון ההרצאות',d:'הרצאה עם תמונות'},{t:'12:30',n:'ארוחת צהריים',d:'תכנית מופ״ת'},{t:'13:00',n:'יציאה לטיול',d:'לפי הרשמה מראש'}]},
+  {day:'שישי',acts:[]},
+  {day:'שבת',acts:[]}
+];
+
+function schedRowHtml(a){
+  const inp='width:100%;padding:8px 10px;border:1px solid var(--line,#e2e8f0);border-radius:8px;font-family:inherit;font-size:.95rem;background:#fff';
+  return `<div class="sched-row" style="display:grid;grid-template-columns:90px 1.4fr 1.6fr 36px;gap:8px;margin-bottom:8px;align-items:center">
+    <input class="s-time" value="${esc(a.t||'')}" placeholder="09:00" style="${inp}" dir="ltr">
+    <input class="s-name" value="${esc(a.n||'')}" placeholder="שם הפעילות" style="${inp}">
+    <input class="s-desc" value="${esc(a.d||'')}" placeholder="מקום / הערה" style="${inp}">
+    <button class="ba" title="מחיקה" onclick="schedRemove(this)" style="background:#fee;color:#b91c1c;border:none;border-radius:8px;height:34px;cursor:pointer">✕</button>
+  </div>`;
+}
+
+async function tabSchedule(){
+  const lib = await loadLib();
+  const ds = lib.display_settings||{};
+  let sched = Array.isArray(ds.schedule) && ds.schedule.length===7 ? ds.schedule : DEFAULT_SCHEDULE;
+  $('tabBody').innerHTML = `
+    <div class="card">
+      <div class="card-h"><h3>לוח שבועי</h3><button class="btn-add" onclick="saveSchedule()">שמור לוח</button></div>
+      <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">מה שמופיע ב"פעילות היום" וב"לוח השבוע" במסך התצוגה. יום בלי פעילויות יוצג כסגור.</p>
+      ${SCHED_DAYS.map((d,i)=>{
+        const acts = (sched[i] && Array.isArray(sched[i].acts)) ? sched[i].acts : [];
+        return `<div class="sched-day" data-i="${i}" style="border:1px solid var(--line,#e2e8f0);border-radius:12px;padding:12px 14px;margin-bottom:12px;background:#fff">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <b style="font-size:1rem">יום ${esc(d)}</b>
+            <button class="ba" onclick="schedAdd(${i})" style="background:#eef7f5;color:#0f766e;border:none;border-radius:8px;padding:6px 12px;cursor:pointer">+ פעילות</button>
+          </div>
+          <div class="sched-rows">${acts.length?acts.map(schedRowHtml).join(''):'<div style="color:var(--ink-soft);font-size:.9rem">אין פעילויות — היום יוצג כסגור</div>'}</div>
+        </div>`;
+      }).join('')}
+      <div class="facts"><button class="btn-save" onclick="saveSchedule()">שמור לוח שבועי</button></div>
+    </div>`;
+}
+
+function schedAdd(i){
+  const day=document.querySelector(`.sched-day[data-i="${i}"] .sched-rows`);
+  if(!day) return;
+  if(day.querySelector('div[style*="אין פעילויות"]')) day.innerHTML='';
+  day.insertAdjacentHTML('beforeend', schedRowHtml({t:'',n:'',d:''}));
+}
+function schedRemove(btn){
+  const row=btn.closest('.sched-row'); if(row) row.remove();
+}
+
+async function saveSchedule(){
+  const lib = await loadLib();
+  const ds = Object.assign({}, lib.display_settings||{});
+  const out=[];
+  document.querySelectorAll('.sched-day').forEach(block=>{
+    const i=Number(block.dataset.i);
+    const acts=[];
+    block.querySelectorAll('.sched-row').forEach(r=>{
+      const t=r.querySelector('.s-time').value.trim();
+      const n=r.querySelector('.s-name').value.trim();
+      const d=r.querySelector('.s-desc').value.trim();
+      if(t||n) acts.push({t,n,d});
+    });
+    acts.sort((a,b)=>(a.t||'zz').localeCompare(b.t||'zz'));
+    out.push({day:SCHED_DAYS[i], acts});
+  });
+  ds.schedule = out;
+  const r = await api('library','update',{display_settings:ds}, lib.id);
+  if(r.success){ _libCache=null; toast('הלוח נשמר ✓'); renderTab(); }
+  else toast(r.message||'שמירה נכשלה');
+}
+
 async function tabSettings(){
   const lib = await loadLib();
   const ds = lib.display_settings||{};

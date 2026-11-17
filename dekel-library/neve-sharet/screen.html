@@ -130,9 +130,6 @@ main{flex:1;display:flex;gap:var(--gap);min-height:0;overflow:hidden}
 .tk .dot{width:clamp(5px,.55vw,10px);height:clamp(5px,.55vw,10px);border-radius:50%;background:#241a06;opacity:.45;flex-shrink:0}
 
 /* accessibility buttons */
-.a11y{position:fixed;bottom:calc(var(--pad) + 4px);left:calc(var(--pad) + 4px);display:flex;gap:6px;z-index:50;opacity:1}
-.a11y button,.a11y a{font-family:'Heebo',sans-serif;font-weight:900;font-size:clamp(12px,1vw,18px);background:#fff;color:var(--forest);border:2px solid var(--forest-light);border-radius:10px;padding:clamp(4px,.5vw,10px) clamp(8px,.9vw,16px);min-height:clamp(30px,3vw,52px);min-width:clamp(40px,3.6vw,64px);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.a11y a.mgr{color:#fff;background:var(--forest-light);border-color:var(--forest)}
 
 @media(max-width:900px){
   main{flex-direction:column}
@@ -196,12 +193,6 @@ main{flex:1;display:flex;gap:var(--gap);min-height:0;overflow:hidden}
     </div>
   </footer>
 
-</div>
-
-<div class="a11y">
-  <button onclick="bumpFont(1)">א+</button>
-  <button onclick="bumpFont(-1)">א-</button>
-  <a class="mgr" id="mgrLink" href="admin.html">ניהול</a>
 </div>
 
 <script>
@@ -329,11 +320,6 @@ function markToday(){
 }
 
 /* ---------- לוח השבוע ---------- */
-/* קישור לניהול — נשמר אותו מועדון (club) שמוצג כרגע */
-(function(){
-  var el=document.getElementById('mgrLink');
-  if(el) el.href='admin.html?club='+encodeURIComponent(CLUB_ID)+'&v=20261116';
-})();
 
 function renderWeek(){
   var today=(new Date()).getDay();
@@ -459,6 +445,16 @@ function applyClub(club){
     if(txt) document.getElementById('fHours').textContent = txt;
   }
   if(club.ticker) CLUB.ticker = club.ticker;
+  if(Array.isArray(club.schedule) && club.schedule.length===7){
+    WEEK = club.schedule.map(function(d,i){
+      var acts = Array.isArray(d.acts) ? d.acts.filter(function(a){return a && (a.n||a.t)}).map(function(a){
+        return {t:String(a.t||''), n:String(a.n||''), d:String(a.d||'')};
+      }) : [];
+      if(!acts.length) acts=[{t:'—',n:'המועדון סגור',d:''}];
+      return {day:d.day || DAYS[i], acts:acts};
+    });
+    renderWeek(); renderToday();
+  }
 }
 
 function loadContent(){
